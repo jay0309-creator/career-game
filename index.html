@@ -532,7 +532,7 @@ table.gt td.num{font-family:var(--f-mono)}
             <input type="radio" name="stance0" id="s0-grind" value="grind" checked><label for="s0-grind">열정 만수르</label>
             <input type="radio" name="stance0" id="s0-life" value="life"><label for="s0-life">칼퇴 수호자</label>
             <input type="radio" name="stance0" id="s0-grow" value="grow"><label for="s0-grow">이력서 업데이트 중</label>
-            <input type="radio" name="stance0" id="s0-social" value="social"><label for="s0-social">사내 인싸</label>
+            <input type="radio" name="stance0" id="s0-social" value="social"><label for="s0-social">마당발</label>
             <input type="radio" name="stance0" id="s0-long" value="long"><label for="s0-long">묵묵한 장인</label>
             <input type="radio" name="stance0" id="s0-show" value="show"><label for="s0-show">포장의 달인</label>
           </div>
@@ -575,7 +575,7 @@ table.gt td.num{font-family:var(--f-mono)}
       </div>
       <div>
         <h3>일하는 자세와 상성</h3>
-        <p>열정 만수르, 칼퇴 수호자, 이력서 업데이트 중, 사내 인싸, 묵묵한 장인, 포장의 달인. 자세마다 상사 성향과 상성이 있어서 궁합이 해마다 오르내립니다. 상성은 그 상사 밑에서 직접 겪어 본 자세만 알 수 있고, 같은 성향 상사를 다시 만나면 기억납니다. 자세는 언제든 바꿀 수 있고, 다음 해 1월부터 적용됩니다.</p>
+        <p>열정 만수르, 칼퇴 수호자, 이력서 업데이트 중, 마당발, 묵묵한 장인, 포장의 달인. 자세마다 상사 성향과 상성이 있어서 궁합이 해마다 오르내립니다. 상성은 그 상사 밑에서 직접 겪어 본 자세만 알 수 있고, 같은 성향 상사를 다시 만나면 기억납니다. 자세는 언제든 바꿀 수 있고, 다음 해 1월부터 적용됩니다.</p>
       </div>
       <div>
         <h3>보직, 위와 아래</h3>
@@ -668,7 +668,7 @@ table.gt td.num{font-family:var(--f-mono)}
           <div class="fx-row">
             <label class="fx-l" for="stance-sel"><span class="lg">일하는 </span>자세</label>
             <select id="stance-sel">
-              <option value="grind">열정 만수르</option><option value="life">칼퇴 수호자</option><option value="grow">이력서 업데이트 중</option><option value="social">사내 인싸</option><option value="long">묵묵한 장인</option><option value="show">포장의 달인</option>
+              <option value="grind">열정 만수르</option><option value="life">칼퇴 수호자</option><option value="grow">이력서 업데이트 중</option><option value="social">마당발</option><option value="long">묵묵한 장인</option><option value="show">포장의 달인</option>
             </select>
             <span class="fx-l"><span class="lg">연초 </span>목표</span>
             <div class="seg">
@@ -754,7 +754,7 @@ table.gt td.num{font-family:var(--f-mono)}
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </div>
 
-<div class="ver-tag" aria-hidden="true">v25</div>
+<div class="ver-tag" aria-hidden="true">v26</div>
 <div id="bgm-box" class="bgm-box"><button type="button" id="bgm-btn" class="bgm-btn" aria-pressed="false">♪ 배경음악 꺼짐</button><button type="button" id="sfx-btn" class="bgm-btn" aria-pressed="false">효과음 꺼짐</button></div>
 <script>
 window.__g125ok = true;
@@ -843,12 +843,12 @@ const ST = {skill:'역량', rep:'평판', energy:'에너지', sat:'만족', rap:
 
 /* 일하는 자세: 해마다 상태 변화(d), 고과 보정(mod, 궁합 점수 단위), 조직 분위기 변화(vibe) */
 const STANCE = {
-  grind:  {label:'열정 만수르',        desc:'회사가 곧 나. 역량·평판이 빨리 오르고 에너지가 많이 줄어요. 보직 제안이 잘 와요.', d:{skill:4, rep:5, energy:-6, sat:-1}, mod:10, vibe:0},
-  life:   {label:'칼퇴 수호자',        desc:'6시 땡. 에너지와 만족이 회복되고, 고과는 조금 손해를 봐요.', d:{skill:0, rep:-1, energy:9, sat:4}, mod:-7, vibe:1},
+  grind:  {label:'열정 만수르',        desc:'회사가 곧 나. 역량·평판이 빨리 오르고 에너지가 가장 많이 줄어요. 보직 제안이 잘 와요.', d:{skill:4, rep:5, energy:-4, sat:-1}, mod:10, vibe:0},
+  life:   {label:'칼퇴 수호자',        desc:'6시 땡. 에너지와 만족이 회복되고, 고과는 조금 손해를 봐요.', d:{skill:0, rep:-1, energy:7, sat:4}, mod:-7, vibe:1},
   grow:   {label:'이력서 업데이트 중', desc:'역량이 크게 오르고, 학술연수·사내 FA·이직 제안이 잘 와요.', d:{skill:6, rep:1, energy:-2, sat:2}, mod:-3, vibe:0},
-  social: {label:'사내 인싸',          desc:'점심 약속이 매일 있어요. 궁합과 조직 분위기가 잘 오르고 회식 사건이 늘어요.', d:{skill:1, rep:3, energy:-1, sat:4}, mod:1, vibe:3},
-  long:   {label:'묵묵한 장인',        desc:'조용히, 오래, 실력으로. 역량이 꾸준히 오르고 평판은 잘 안 올라요. 고과가 다로 모이고 사직·이직을 잘 안 해요.', d:{skill:3, rep:0, energy:3, sat:2}, mod:1, vibe:1},
-  show:   {label:'포장의 달인',        desc:'일은 보고로 완성된다. 평판과 궁합이 잘 오르고 역량은 제자리예요. 보고를 좋아하는 상사와 잘 맞아요.', d:{skill:0, rep:4, energy:-2, sat:1}, mod:3, vibe:-1}
+  social: {label:'마당발',             desc:'점심 약속이 매일 있어요. 궁합과 조직 분위기가 잘 오르고 회식 사건이 늘어요. 에너지가 조금 줄어요.', d:{skill:1, rep:3, energy:-3, sat:4}, mod:1, vibe:3},
+  long:   {label:'묵묵한 장인',        desc:'조용히, 오래, 실력으로. 역량이 꾸준히 오르고 평판은 잘 안 올라요. 고과가 다로 모이고 사직·이직을 잘 안 해요.', d:{skill:3, rep:0, energy:1, sat:2}, mod:1, vibe:1},
+  show:   {label:'포장의 달인',        desc:'일은 보고로 완성된다. 평판과 궁합이 잘 오르고 역량은 제자리예요. 보고를 좋아하는 상사와 잘 맞아요. 보고 준비로 에너지가 조금 줄어요.', d:{skill:0, rep:4, energy:-3, sat:1}, mod:3, vibe:-1}
 };
 const STANCE_KEYS = ['grind','life','grow','social','long','show'];
 const STANCE_EV = {
@@ -2890,7 +2890,7 @@ const CHAINS = [
             run:(S, v) => { v.bond = 0; return {text:'“모르는 거 있으면 물어봐요.” 신입은 끝내 묻지 않았다.', chips:add(S, {energy:1})}; }}
         ]},
       {title:'보고서 숫자가 틀렸다',
-        body:(S, v) => v.nm + ' 님이 만든 보고서가 이미 위로 올라갔는데, 핵심 숫자가 한 자리 틀렸습니다. 신입의 얼굴이 하얗게 질려 있습니다.',
+        body:(S, v) => '입사 1년을 막 넘긴 ' + v.nm + ' 님이 처음 혼자 만든 보고서가 이미 위로 올라갔는데, 핵심 숫자가 한 자리 틀렸습니다. ' + v.nm + ' 님의 얼굴이 하얗게 질려 있습니다.',
         opts:[
           {label:'내가 감싸고 같이 수습한다', hint:'평판이 조금 내려가고 호감이 크게 쌓여요', auto:() => 1.1,
             run:(S, v) => { v.bond += 2; return {text:'“제가 검토를 놓쳤습니다.” 그날 밤 둘이서 숫자를 다시 맞췄다.', chips:add(S, {rep:-1, energy:-2})}; }},
@@ -2938,7 +2938,7 @@ const CHAINS = [
         ]}
     ]},
 
-  {id:'alpha', name:'AI 비서 ‘알파’', title:'알파의 주인', slot:0, gaps:[[1, 1]],
+  {id:'alpha', name:'AI 비서 ‘알파’', title:'알파의 원조', slot:0, gaps:[[1, 2]],
     cond:S => S.tenure >= 1,
     inter:() => [['알파가 회의록을 대신 정리했다. 결론 칸에 “다음 회의에서 논의”라고 적었다. 정확했다.']],
     steps:[
@@ -2950,13 +2950,13 @@ const CHAINS = [
           {label:'관심 없다', hint:'이야기가 여기서 끝나요', auto:() => 0.4,
             run:S => ({text:'알파는 다른 사람들의 말투를 배워 갔다.', chips:[], fin:true})}
         ]},
-      {title:'휴가 중에 나간 회신',
-        body:S => '휴가에서 돌아와 보니, 알파가 나 대신 보낸 회신이 사내에서 화제입니다. “검토해 보니 세 가지가 문제입니다. 첫째, 이 회의는 메일로 충분합니다.” ' + alphaReact(S).t,
+      {title:'알파 정식 오픈',
+        body:S => chAgo('alpha') + ', 알파가 전사에 정식으로 도입됐습니다. 그런데 시범 기간에 내 말투를 가장 많이 배운 탓에, 알파의 기본 말투가 내 말투가 됐습니다. 사업부 메일 끝마다 ‘확인 부탁드립니다’가 붙기 시작했습니다. ' + alphaReact(S).t,
         opts:[
-          {label:'알파를 계속 쓴다', hint:'상사 반응이 그대로 이어져요', auto:() => 1,
-            run:S => { const r = alphaReact(S); return {text:'알파를 계속 쓰기로 했다. 알파는 그 회신을 ‘성공 사례’로 학습했다.', chips:add(S, Object.assign({skill:1}, r.d)), title:true, fin:'알파와 함께 일하는 사람이 됐다. 이제 알파가 내 말투로 농담도 한다.'}; }},
-          {label:'학습 기록을 초기화한다', hint:'상사 반응이 반쯤 누그러져요', auto:() => 1,
-            run:S => { const r = alphaReact(S); const d = {}; Object.keys(r.d).forEach(k => { d[k] = Math.round(r.d[k] / 2); }); return {text:'알파가 처음 만난 사람처럼 인사했다. “무엇을 도와드릴까요?” 조금 서운했다.', chips:add(S, Object.assign({sat:-1}, d)), fin:'알파는 다시 처음부터 배우기 시작했다.'}; }}
+          {label:'그대로 둔다', hint:'상사 반응이 그대로 이어져요', auto:() => 1,
+            run:S => { const r = alphaReact(S); return {text:'그대로 두기로 했다. 사업부 전체가 조금씩 내 말투로 메일을 쓰게 됐다.', chips:add(S, Object.assign({skill:1}, r.d)), title:true, fin:'알파의 원조 엔딩. 신입들이 내 메일을 보고 “알파 같다”고 한다.'}; }},
+          {label:'내 말투를 지워 달라고 요청한다', hint:'상사 반응이 반쯤 누그러져요', auto:() => 1,
+            run:S => { const r = alphaReact(S); const d = {}; Object.keys(r.d).forEach(k => { d[k] = Math.round(r.d[k] / 2); }); return {text:'요청서를 냈다. 다음 주부터 알파는 아무 말투도 아닌 말투가 됐다. 조금 서운했다.', chips:add(S, Object.assign({sat:-1}, d)), fin:'알파는 다시 처음부터 배우기 시작했다.'}; }}
         ]}
     ]},
 
@@ -3008,7 +3008,7 @@ const CHAINS = [
             run:(S, v) => { v.tee = -1; v.rel = 0; return {text:'“카메라는 꺼 둬도 될까요?” 목소리로만 참석했다.', chips:add(S, {rep:-1})}; }}
         ]},
       {title:'같은 고객사, 다시 출장',
-        body:(S, v) => '같은 고객사로 다시 출장을 갑니다. 공항 출구에 상대 담당자가 마중을 나와 있습니다. ' + (v.tee === 1 ? '그때 그 티셔츠를 입고.' : '어딘가 낯익은 표정으로.'),
+        body:(S, v) => chAgo('bag') + ', 같은 고객사로 다시 출장을 갑니다. 공항 출구에 상대 담당자가 마중을 나와 있습니다. ' + (v.tee === 1 ? '그때 그 티셔츠를 입고.' : '어딘가 낯익은 표정으로.'),
         opts:[
           {label:'나도 그 티셔츠를 꺼내 입는다', show:(S, v) => v.tee === 1, hint:'관계가 크게 좋아져요', auto:() => 1.5,
             run:(S, v) => { v.rel += 2; return {text:'둘이 같은 티셔츠를 입고 미팅에 들어갔다. 그날 회의는 30분 일찍 끝났다.', chips:add(S, {rep:2, sat:2})}; }},
@@ -3018,7 +3018,7 @@ const CHAINS = [
             run:(S, v) => { v.rel += 1; return {text:'현지 식당에서 가방 실종 이야기로 두 시간을 웃었다.', chips:add(S, {energy:-2, sat:2})}; }}
         ]},
       {title:'큰 계약이 걸린 자리',
-        body:() => '그 고객사와 큰 계약이 걸린 최종 미팅이 잡혔습니다. 그때의 담당자는 이제 결정권자가 되어 있습니다.',
+        body:() => chAgo('bag') + ', 그 고객사와 큰 계약이 걸린 최종 미팅이 잡혔습니다. 그사이 그때의 담당자는 결정권자가 되어 있습니다.',
         opts:[
           {label:'그때 그 티셔츠를 챙겨 간다', hint:'쌓아 온 관계가 클수록 잘돼요', auto:() => 1.1,
             run:(S, v) => { later(S, 3, '3년 전 잃어버린 가방이 택배로 돌아왔다. 안에 든 정장은 이제 작았다.', {sat:2}); if (R() < 0.3 + v.rel * 0.2) return {text:'미팅 시작 전, 상대가 먼저 티셔츠 얘기를 꺼냈다. 계약서는 그날 오후에 나왔다.', chips:add(S, {rep:6, sat:3}), title:v.rel >= 2, fin:'계약이 성사됐다.'};
@@ -3067,7 +3067,7 @@ const CHAINS = [
         ]}
     ]},
 
-  {id:'busseat', name:'통근버스 고정석 전쟁', title:'출근 메이트', slot:0, bind:'site', gaps:[[1, 1]],
+  {id:'busseat', name:'통근버스 고정석 전쟁', title:'출근 메이트', slot:0, bind:'site', gaps:[[1, 2]],
     cond:S => S.tenure >= 3 && S.site.indexOf('서울') !== 0 && lvl(S) <= 1,
     bye:'근무지가 바뀌면서 고정석 전쟁도 끝났다. 그 신입이 그 자리에 오래 앉기를.',
     inter:() => [['통근버스에서 그 신입과 눈이 마주쳤다. 둘 다 창밖을 봤다.']],
@@ -3082,13 +3082,15 @@ const CHAINS = [
           {label:'내일 5분 일찍 탄다', hint:'에너지가 조금 줄어요', auto:() => 1,
             run:S => ({text:'다음 날 5분 일찍 탔다. 신입은 10분 일찍 와 있었다.', chips:add(S, {energy:-2})})}
         ]},
-      {title:'버스 안의 냉전',
-        body:() => '어느새 버스 안에 소리 없는 ‘자리 냉전’이 번졌습니다. 다들 5분씩 일찍 타기 시작했고, 기사님이 출발 전에 마이크를 잡았습니다. “자리 가지고 그러지들 맙시다.”',
+      {title:'노선 개편',
+        body:() => chAgo('busseat') + ', 통근버스 노선이 개편됐습니다. 그 신입과 나만 같은 노선에 남았습니다. 이제 이 버스에는 둘뿐입니다.',
         opts:[
-          {label:'평화 협정을 제안한다', hint:'만족이 오르고 출근 메이트가 생겨요', auto:() => 1.3,
-            run:S => ({text:'“격일로 앉을까요?” 신입이 웃었다. 다음 날부터 둘이 나란히 앉아 출근했다.', chips:add(S, {sat:3, energy:1}), title:true, fin:'평화 협정 엔딩. 그 신입과 출근 메이트가 됐다.'})},
-          {label:'끝까지 버틴다', hint:'결과가 허무할 수 있어요', auto:() => 0.6,
-            run:S => ({text:'버텼다. 다음 달 노선 개편으로 그 버스가 없어졌다.', chips:add(S, {sat:-2}), fin:'허무 엔딩. 노선 개편으로 둘 다 자리를 잃었다.'})}
+          {label:'먼저 인사하고 옆자리에 앉는다', hint:'만족이 오르고 출근 메이트가 생겨요', auto:() => 1.3,
+            run:S => ({text:'“그동안 제 자리 잘 쓰셨죠?” 신입이 웃었다. 그날부터 출근길이 짧아졌다.', chips:add(S, {sat:3, energy:1}), title:true, fin:'출근 메이트 엔딩. 그 신입과 매일 아침 같은 버스를 탄다.'})},
+          {label:'그 창가 자리를 양보한다', hint:'만족이 조금 올라요', auto:() => 1,
+            run:S => ({text:'창가 자리를 내줬다. 다음 날 아침, 내 자리에 캔커피가 놓여 있었다.', chips:add(S, {sat:2}), title:true, fin:'양보 엔딩. 캔커피는 그 뒤로도 가끔 놓여 있었다.'})},
+          {label:'앞뒤로 따로 앉는다', hint:'아무 일도 일어나지 않아요', auto:() => 0.6,
+            run:S => ({text:'앞뒤로 앉았다. 둘만 탄 버스는 생각보다 조용했다.', chips:add(S, {sat:-1}), fin:'평행선 엔딩. 그 신입의 이름은 끝내 몰랐다.'})}
         ]}
     ]},
 
@@ -3113,7 +3115,7 @@ const CHAINS = [
             run:S => R() < clamp(0.45 + (S.st.skill - 50) / 150, 0.3, 0.8) ? {text:'직감이 맞았다. 객석의 동료들이 일어섰다.', chips:add(S, {sat:3, rep:1})} : {text:'직감은 직감일 뿐이었다.', chips:add(S, {sat:1}), fin:'본선 탈락. 사내 굿즈 한 박스를 받았다.'}}
         ]},
       {title:'결승, 마지막 문제',
-        body:() => '결승 마지막 문제. 답을 아는 것 같기도 하고 모르는 것 같기도 합니다. 전화 찬스가 하나 남았습니다.',
+        body:() => '한 시즌을 기다려 결승 무대에 섰습니다. 마지막 문제. 답을 아는 것 같기도 하고 모르는 것 같기도 합니다. 전화 찬스가 하나 남았습니다.',
         opts:[
           {label:'직감으로 찍는다', hint:'반반', auto:() => 1,
             run:S => R() < 0.45 ? {text:'정답. 상품으로 신제품을 받았다. 엔딩 크레디트에 내 이름이 올랐다.', chips:add(S, {sat:5, rep:3}), title:true, fin:'시즌 우승.'} : {text:'오답. 준우승 상품은 사내 굿즈 한 박스였다. 생각보다 많았다.', chips:add(S, {sat:2}), fin:'준우승.'}},
@@ -3122,7 +3124,7 @@ const CHAINS = [
         ]}
     ]},
 
-  {id:'plant', name:'옆 팀과의 화분 전쟁', title:'화분 평화 대사', slot:0, bind:'team', gaps:[[1, 1]],
+  {id:'plant', name:'옆 팀과의 화분 전쟁', title:'화분 평화 대사', slot:0, bind:'team', gaps:[[1, 2]],
     cond:S => S.tenure >= 1 && lvl(S) <= 2,
     bye:'팀을 옮기면서 화분 전쟁에서도 빠지게 됐다. 몬스테라의 안녕을 빈다.',
     inter:() => [['몬스테라 이름표 위에 새 이름표가 붙었다. 이번엔 옆 팀 것이었다.']],
@@ -3137,13 +3139,15 @@ const CHAINS = [
           {label:'새 화분을 산다', hint:'이야기가 여기서 끝나요', auto:() => 0.5,
             run:S => ({text:'새 몬스테라가 더 잘 자랐다.', chips:add(S, {sat:1}), fin:'옛 화분은 옆 팀에서 잘 지낸다.'})}
         ]},
-      {title:'전쟁이 커졌다',
-        body:() => '화분에 양 팀 이름표가 겹겹이 붙었고, 누군가 장난감 감시 카메라까지 달아 놓았습니다. 몬스테라 잎이 조금씩 시들고 있습니다.',
+      {title:'몬스테라가 천장에 닿았다',
+        body:() => chAgo('plant') + ', 그 몬스테라가 천장까지 자라 두 팀 자리 경계를 덮었습니다. 화분이 너무 커져서 누군가 분갈이를 해야 합니다. 화분에는 여전히 양 팀 이름표가 겹겹이 붙어 있습니다.',
         opts:[
-          {label:'휴전하고 공동 관리하자고 제안한다', hint:'평판과 만족이 오르고 칭호를 받아요', auto:() => 1.3,
-            run:S => ({text:'양 팀 공동 물 주기 당번표가 생겼다. 몬스테라에 새 잎이 났다.', chips:add(S, {rep:2, sat:2, vibe:3}), title:true, fin:'휴전 엔딩. 두 팀 사이가 좋아졌다.'})},
-          {label:'끝까지 간다', hint:'아무도 이기지 못할 수 있어요', auto:() => 0.5,
-            run:S => ({text:'화분이 양쪽을 오가는 동안 몬스테라가 말라 갔다. 결국 아무도 물을 주지 않았다.', chips:add(S, {sat:-2}), fin:'시든 화분 엔딩. 양 팀 모두 패자였다.'})}
+          {label:'두 팀이 같이 분갈이한다', hint:'평판과 만족이 오르고 칭호를 받아요', auto:() => 1.3,
+            run:S => ({text:'토요일 오전, 두 팀이 모여 분갈이를 했다. 끝나고 같이 짜장면을 먹었다.', chips:add(S, {rep:2, sat:2, vibe:3}), title:true, fin:'공동 육아 엔딩. 몬스테라는 두 팀의 마스코트가 됐다.'})},
+          {label:'우리 팀이 맡는다', hint:'에너지가 조금 들어요', auto:() => 1,
+            run:S => ({text:'주말에 나와 혼자 분갈이를 했다. 월요일, 옆 팀이 감사 쪽지를 붙여 놨다.', chips:add(S, {energy:-2, sat:2}), title:true, fin:'원조 집사 엔딩. 화분 이름표가 다시 우리 팀으로 바뀌었다.'})},
+          {label:'옆 팀에 넘긴다', hint:'이야기가 여기서 끝나요', auto:() => 0.6,
+            run:S => ({text:'“이제 그쪽 화분 하세요.” 옆 팀이 정성껏 키웠다. 조금 아까웠다.', chips:add(S, {sat:-1}), fin:'이별 엔딩. 몬스테라는 옆 팀에서 잘 자란다.'})}
         ]}
     ]},
 
@@ -3181,16 +3185,16 @@ const CHAINS = [
     bye:'보직이 바뀌면서 칼퇴 실험은 다음 사람에게 넘어갔다.',
     inter:(S, v) => [['6시 정각, ' + unitOf(v) + ' 자리의 불이 꺼졌다. 옆 ' + ga(unitOf(v)) + ' 힐끗 봤다.']],
     steps:[
-      {title:'“6주만 칼퇴 실험 해 봐요”',
-        body:(S, v) => unitOf(v) + '원 한 명이 제안했습니다. “6주만 모두 6시에 퇴근해 보면 어떨까요? 성과가 떨어지면 바로 그만두고요.”',
+      {title:'“1년만 칼퇴 실험 해 봐요”',
+        body:(S, v) => unitOf(v) + '원 한 명이 제안했습니다. “올해 1년만 모두 6시에 퇴근해 보면 어떨까요? 성과가 떨어지면 바로 그만두고요.”',
         opts:[
           {label:'허락한다', hint:'에너지가 조금 회복돼요', fx:{v:1}, auto:() => 1.2,
             run:(S, v) => ({text:'6시 정각, ' + unitOf(v) + ' 자리가 텅 비었다. 첫 주에는 다들 불안해서 메신저를 들여다봤다.', chips:add(S, {vibe:4, energy:2})})},
           {label:'“지금은 바쁜 시기라…”', hint:'이야기가 여기서 끝나요', auto:() => 0.4,
             run:S => ({text:'실험은 ‘나중에’ 폴더로 들어갔다.', chips:add(S, {vibe:-2}), fin:true})}
         ]},
-      {title:'6주 실험 결과',
-        body:() => '6주 실험 결과가 나왔습니다. 성과 지표는 그대로이고, 일부는 오히려 조금 올랐습니다. 줄어든 건 야근 시간뿐입니다.',
+      {title:'1년 실험 결과',
+        body:() => '1년 실험 결과가 나왔습니다. 연간 성과 지표는 그대로이고, 일부는 오히려 조금 올랐습니다. 줄어든 건 야근 시간뿐입니다.',
         opts:[
           {label:'위에 결과를 공유한다', hint:'평판이 오르고, 일이 커질 수 있어요', auto:() => 1,
             run:(S, v) => { v.share = 1; return {text:'결과를 정리해 ' + S.boss.title + '에게 보냈다. “흥미롭네요.” 답장은 그 한 줄이었다.', chips:add(S, {rep:2})}; }},
@@ -3198,8 +3202,8 @@ const CHAINS = [
             run:(S, v) => { v.share = 0; return {text:'보고는 하지 않았다. 6시면 ' + unitOf(v) + ' 불이 꺼졌다.', chips:add(S, {vibe:3})}; }}
         ]},
       {title:(S, v) => v.share ? '팀 전체로 넓힐까' : '“거기는 왜 6시면 다 없어요?”',
-        body:(S, v) => v.share ? '공유한 결과를 보고 같은 ' + (v.lv === 1 ? '그룹의 다른 파트' : '팀의 다른 그룹') + '들이 하나둘 따라 하기 시작했습니다. 결국 팀장이 팀 전체에 적용할지 회의를 엽니다.'
-          : '옆 ' + unitOf(v) + ' 사람들이 찾아와 묻습니다. “거기는 왜 6시면 다 없어요?”',
+        body:(S, v) => v.share ? '그 뒤 1년 사이, 공유한 결과를 보고 같은 ' + (v.lv === 1 ? '그룹의 다른 파트' : '팀의 다른 그룹') + '들이 하나둘 따라 하기 시작했습니다. 결국 팀장이 팀 전체에 적용할지 회의를 엽니다.'
+          : '실험 2년째. 옆 ' + unitOf(v) + ' 사람들이 찾아와 묻습니다. “거기는 왜 6시면 다 없어요?”',
         opts:[
           {label:'데이터로 설득한다', show:(S, v) => !!v.share, hint:'팀장 성향과 조직 분위기에 따라 갈려요', auto:() => 1,
             run:(S, v) => sixpmEnd(S, v, 0.05)},
@@ -3231,7 +3235,7 @@ const CHAINS = [
             run:(S, v) => { v.tf = 0; return {text:'“회의록만 공유해 주세요.” 유니콘은 멀리서 지켜보기로 했다.', chips:add(S, {vibe:2})}; }}
         ]},
       {title:'중간보고',
-        body:() => '경영진 중간보고. 슬라이드 30장을 넘기던 중 질문이 들어왔습니다. “그래서 이게 돈이 됩니까?”',
+        body:() => '경영진 중간보고입니다. 슬라이드 30장을 넘기던 중 질문이 들어왔습니다. “그래서 이게 돈이 됩니까?”',
         opts:[
           {label:'“3년 뒤 시장 규모는…” 숫자로 답한다', hint:'역량이 높을수록 잘 통해요', auto:() => 1,
             run:(S, v) => { v.score += S.st.skill >= 60 ? 2 : 1; return {text:'숫자가 쏟아졌다. 질문한 사람이 고개를 끄덕였다. 아마도.', chips:add(S, {rep:2})}; }},
@@ -3350,7 +3354,7 @@ const CHAINS = [
         ]}
     ]},
 
-  {id:'snack', name:'탕비실 간식 미스터리', title:'탕비실 탐정', slot:0, bind:'team', gaps:[[1, 1]],
+  {id:'snack', name:'탕비실 간식 미스터리', title:'탕비실 탐정', slot:0, bind:'team', gaps:[[1, 2]],
     cond:S => S.tenure >= 1 && lvl(S) <= 1,
     keep:S => lvl(S) <= 1,
     bye:'자리가 바뀌면서 탕비실 미스터리는 미제로 남았다.',
@@ -3366,16 +3370,29 @@ const CHAINS = [
           {label:'내 간식만 서랍에 숨긴다', hint:'이야기가 여기서 끝나요', auto:() => 0.4,
             run:S => ({text:'서랍 속 과자는 안전했다.', chips:add(S, {sat:1}), fin:'미스터리는 미스터리로 남았다.'})}
         ]},
-      {title:'범인을 봤다',
-        body:S => '밤 10시, 탕비실에서 과자 봉지 소리가 납니다. 살짝 들여다보니 매일 밤 혼자 야근하던 ' + (lvl(S) === 1 ? S.boss.title + ' ' + S.boss.name + ' 님' : '그룹장님') + '입니다. 한 손엔 보고서, 한 손엔 초코 과자.',
+      {title:'그 과자가 돌아왔다',
+        body:() => chAgo('snack') + ', 다른 조직으로 떠나는 그룹장님이 탕비실에 과자 한 상자를 두고 갔습니다. 상자 위에 쪽지가 있습니다. “그동안 밤마다 몰래 먹은 과자값입니다. 미안했어요.”',
         opts:[
-          {label:'모른 척하고 다음 날 과자를 더 채워 둔다', hint:'칭호를 받아요', auto:() => 1.2,
-            run:S => ({text:'다음 날 과자 옆에 ‘감사합니다’ 쪽지가 붙어 있었다. 필체가 결재 서명과 같았다.', chips:add(S, lvl(S) === 1 ? {rap:3, sat:1} : {sat:2}), title:true, fin:'훈훈한 엔딩. 탕비실 과자는 그 뒤로 늘 두 배였다.'})},
-          {label:'팀 회의에서 웃으며 공개한다', hint:'상사 반응은 성향에 따라 달라요', fx:{r:'?', v:1}, auto:() => 0.8,
-            run:S => { const ok = ['kind','bungae','free','home'].indexOf(S.boss.type) >= 0; return {text:'“범인은… 그룹장님!” 회의실이 뒤집어졌다. 그룹장은 웃었다. 아마도.', chips:add(S, lvl(S) === 1 ? {vibe:4, rap:ok ? 2 : -3} : {rep:2, sat:2}), title:true, fin:'폭로 엔딩. ‘탕비실 탐정’이라는 별명이 생겼다.'}; }}
+          {label:'쪽지를 탕비실에 붙여 둔다', hint:'만족이 오르고 칭호를 받아요', auto:() => 1.2,
+            run:S => ({text:'쪽지 밑에 누가 ‘괜찮아요, 잘 가세요’라고 적었다. 그 밑으로 댓글이 열두 개 달렸다.', chips:add(S, {sat:2, rep:1}), title:true, fin:'훈훈한 엔딩. 쪽지는 지금도 탕비실 냉장고에 붙어 있다.'})},
+          {label:'쪽지는 내가 간직한다', hint:'만족이 조금 올라요', auto:() => 1,
+            run:S => ({text:'쪽지를 다이어리에 끼워 뒀다. 범인은 나만 아는 비밀이 됐다.', chips:add(S, {sat:2}), title:true, fin:'비밀 엔딩. 탕비실 탐정은 끝내 범인을 공개하지 않았다.'})},
+          {label:'메신저로 답장을 보낸다', hint:'평판이 조금 올라요', auto:() => 0.9,
+            run:S => ({text:'“과자값은 충분합니다. 새 조직에서도 야근은 적당히 하세요.” 이모티콘 세 개가 답장으로 왔다.', chips:add(S, {sat:1, rep:1}), title:true, fin:'답장 엔딩. 가끔 그 그룹장님에게서 과자 사진이 온다.'})}
         ]}
     ]}
 ];
+/* v26: 해가 지나 이어지는 편은 지난 시간을 앞에 붙인다 */
+function chAgoN(id){ const cs = S && S.chains && S.chains.st[id]; return cs && cs.lastY !== undefined ? Math.max(1, S.year - cs.lastY) : 1; }
+function chAgo(id){ return chAgoN(id) + '년 뒤'; }
+function chSince(id){ const cs = S && S.chains && S.chains.st[id]; return (cs ? Math.max(1, S.year - cs.startY) : 1) + '년'; }
+[['b302', 1, id => chAgo(id) + ', '], ['b302', 2, id => chAgo(id) + ', '],
+ ['band', 1, id => chAgoN(id) + '년 연습 끝에 첫 무대. '], ['band', 2, id => chAgo(id) + ', '],
+ ['tmpl', 1, id => chAgo(id) + ', '], ['tmpl', 2, id => chAgo(id) + ', '],
+ ['unicorn', 1, id => 'TF를 시작한 지 ' + chSince(id) + ', '], ['unicorn', 2, id => chAgo(id) + ', '],
+ ['codename', 1, id => chAgo(id) + ', '],
+ ['foodie', 1, id => '후기 연재 ' + chSince(id) + '째, '], ['foodie', 2, id => '후기 연재 ' + chSince(id) + '째, ']
+].forEach(([id, i, pre]) => { const c = CHAINS.find(x => x.id === id); if (!c || !c.steps[i]) return; const b = c.steps[i].body; c.steps[i].body = (S, v) => pre(id) + b(S, v); });
 const CH = {}; CHAINS.forEach(c => { CH[c.id] = c; c.steps.forEach((st, i) => { const id = 'ch_' + c.id + '_' + i; EV[id] = Object.assign({cool:0, cond:() => true}, st, {id, chain:c.id, step:i}); }); });
 
 /* 연작 결말 계산 */
@@ -3395,12 +3412,12 @@ function chainRookieEnd(S, v, tone){
 }
 function alphaReact(S){
   const t = S.boss.type;
-  if (t === 'ai') return {t:'상사가 그 메일을 팀 전체에 공유하며 말했습니다. “이게 AX입니다.”', d:{rap:6}};
-  if (t === 'report') return {t:'상사가 그 메일을 출력해 문장마다 빨간 줄을 그어 돌려줬습니다.', d:{rap:-4}};
-  if (t === 'detail') return {t:'상사가 그 메일에서 띄어쓰기 오류 두 개를 찾아 회신했습니다.', d:{rap:-2}};
-  if (t === 'meeting') return {t:'상사가 그 메일 이야기를 하자며 회의를 잡았습니다. 1시간 40분짜리로.', d:{energy:-2}};
-  if (t === 'free') return {t:'상사는 그 메일을 읽지 않은 것 같습니다.', d:{}};
-  return {t:'사내 메신저에 그 메일 캡처가 돌았고, 상사도 웃었다는 소문입니다.', d:{rap:2}};
+  if (t === 'ai') return {t:'상사가 “이게 진짜 AX네요”라며 내 이름을 사내 게시판에 올렸습니다.', d:{rap:6}};
+  if (t === 'report') return {t:'상사가 알파가 쓴 메일을 출력해 문장마다 빨간 줄을 그어 돌려줬습니다. “이 말투 누구 거예요?”', d:{rap:-4}};
+  if (t === 'detail') return {t:'상사가 알파 메일에서 내 말버릇 그대로인 띄어쓰기 오류를 찾아냈습니다.', d:{rap:-2}};
+  if (t === 'meeting') return {t:'상사가 ‘알파 말투 개선’ 회의를 잡았습니다. 1시간 40분짜리로.', d:{energy:-2}};
+  if (t === 'free') return {t:'상사는 알파 말투가 바뀐 줄도 모르는 것 같습니다.', d:{}};
+  return {t:'사내 메신저에 ‘알파 말투 원조 찾기’ 글이 돌았고, 상사도 웃었다는 소문입니다.', d:{rap:2}};
 }
 function quizCall(S){
   const t = S.boss.type;
@@ -3856,6 +3873,7 @@ function chainAfter(e, res){
   }
   cs.step = e.step + 1;
   const g = (c.gaps && c.gaps[e.step]) || [1, 2];
+  cs.lastY = S.year;
   cs.due = S.year + ri(g[0], g[1]);
 }
 /* 조직·보직이 바뀌어 이어갈 수 없으면 작별 문장으로 끝낸다 */
@@ -4921,32 +4939,40 @@ function checkDemotion(g){
 
 /* v25: 에너지 회복 수단 안내 */
 const EN_TIPS = [
-  ['일하는 자세를 ‘칼퇴 수호자’로', '연말마다 에너지 +9 (‘묵묵한 장인’은 +3). 다음 해부터 적용돼요.'],
+  ['일하는 자세를 ‘칼퇴 수호자’로', '연말마다 에너지가 가장 많이 회복돼요 (‘묵묵한 장인’도 조금 회복). 다음 해부터 적용돼요.'],
   ['휴가 사건에서 쉬는 선택지', '‘일주일 다 쓴다’, ‘연차 이틀 붙여 쉰다’, ‘2주 다 쓴다’처럼 쉬는 쪽을 골라요.'],
   ['부가활동 바꾸기', '에너지를 쓰는 활동은 빼고, ‘6시 정각 사무실 불 끄기’·‘점심시간 헬스장 오픈런’처럼 채우는 활동을 골라요.'],
-  ['⚠ 에너지 바닥 표시가 붙은 선택지 피하기', '에너지가 15 이하일 때 에너지를 쓰는 선택지에 표시가 붙어요.'],
+  ['⚠ 에너지 바닥 표시가 붙은 선택지 피하기', '에너지가 25 이하일 때 에너지를 쓰는 선택지에 표시가 붙어요.'],
   ['한계 이벤트가 뜨면 ‘이틀 쉰다’', '에너지가 20 아래로 떨어지면 가끔 떠요. 에너지 +12.']
 ];
+/* v26: 임원 승진 자세 보너스 (열정 만수르·마당발·포장의 달인이 비슷하게). 포장의 달인은 고과 기준이 한 칸 낮다 */
+function execStanceBonus(S){
+  const b = S.autoBase || S.stance;
+  const x = {grind:EXB.grind, social:EXB.social, show:EXB.show}[b] || 0;
+  return Math.max(x, S.cnt.stance.grind >= 12 ? EXB.grind : 0);
+}
+const EXB = {grind:0.01, social:0.09, show:0.06};
+const EXB2 = 0.04;
 /* v24: 에너지 0으로 연말을 맞은 보직자 */
 function burnoutDown(S){
   const was = ROLE_T[S.role]; const to = S.role - 1; const now = ROLE_T[to];
   S.role = to; S.roleStart = S.year + 1; S.flags.noOffer = S.year + 2; S.cnt.burnDowns = (S.cnt.burnDowns || 0) + 1;
   logItem('mile', '2년 연속 에너지가 바닥난 채 연말을 맞았다. ' + was + ' 자리를 내려놓았다.');
   addPath(S, was + ' → ' + now + ' (번아웃)');
-  enqueue({type:'demote', title:was, now, why:'번아웃', text:'2년 연속 에너지가 0인 채로 연말을 맞았다. ' + was + ' 자리를 내려놓고 ' + euro(now) + ' 돌아간다. 2년 동안은 보직 제안이 오지 않는다.'});
+  enqueue({type:'demote', title:was, now, why:'번아웃', text:'2년 연속 에너지가 10 이하인 채로 연말을 맞았다. ' + was + ' 자리를 내려놓고 ' + euro(now) + ' 돌아간다. 2년 동안은 보직 제안이 오지 않는다.'});
   changeBoss(S, 'selfDown'); resetActs(S);
 }
 function yearEnd(){
   S.month = 12;
   let burnEnd = false;
-  const zeroNow = !S.away && lvl(S) >= 1 && S.st.energy < 1;
+  const zeroNow = !S.away && lvl(S) >= 1 && S.st.energy <= 10;
   if (zeroNow && S.flags.zeroPrev){
     S.flags.zeroPrev = false;
     if (lvl(S) >= 3){ burnEnd = true; S.flags.burnEnd = 1; logItem('mile', '2년 연속 에너지가 바닥난 채 연말을 맞았다. 자리에서 물러나기로 했다.'); }
     else burnoutDown(S);
   } else if (zeroNow){
     S.flags.zeroPrev = true; S.cnt.yellow = (S.cnt.yellow || 0) + 1;
-    logItem('mile', '에너지가 바닥난 채 한 해를 마쳤다. 옐로카드를 받았다. 내년에도 이러면 ' + (lvl(S) >= 3 ? '자리에서 물러나야 한다.' : '보직을 내려놓아야 한다.'));
+    logItem('mile', '에너지가 10 이하인 채 한 해를 마쳤다. 옐로카드를 받았다. 내년에도 이러면 ' + (lvl(S) >= 3 ? '자리에서 물러나야 한다.' : '보직을 내려놓아야 한다.'));
     enqueue({type:'yellow', title:'옐로카드', exec:lvl(S) >= 3, role:roleOf(S)});
   } else S.flags.zeroPrev = false;
   const awayRest = S.away && S.away.group === 'rest';
@@ -5021,8 +5047,8 @@ function yearEnd(){
     } else {
       const avg = avgPts(S, 3);
       let p = 0;
-      if (!S.exec && S.cl === 4 && (L === 2 || (S.away && S.away.kind === '주재원' && (S.flags.jujRole || 0) >= 1)) && S.yrsInLevel >= 3 && !S.flags.noExec && avg >= 2.7) p = clamp(0.09 + ((S.autoBase || S.stance) === 'grind' || S.cnt.stance.grind >= 12 ? 0.18 : 0) + (avg - 2.7) * 0.3 + (S.flags.execBoost || 0) + (S.vibe - 65) / 400, 0.04, 0.35);
-      else if (S.exec === 1 && S.execYears >= 2 && avg >= 2.9) p = clamp(0.12 + (S.cnt.stance.grind >= 12 ? 0.04 : 0) + (avg - 2.9) * 0.3 + (S.vibe - 65) / 400, 0.05, 0.3) * 0.96;
+      if (!S.exec && S.cl === 4 && (L === 2 || (S.away && S.away.kind === '주재원' && (S.flags.jujRole || 0) >= 1)) && S.yrsInLevel >= 3 && !S.flags.noExec && avg >= ((S.autoBase || S.stance) === 'show' ? 2.6 : 2.7)) p = clamp(0.09 + execStanceBonus(S) + (avg - 2.7) * 0.3 + (S.flags.execBoost || 0) + (S.vibe - 65) / 400, 0.04, 0.35);
+      else if (S.exec === 1 && S.execYears >= 2 && avg >= 2.9) p = clamp(0.12 + (S.cnt.stance.grind >= 12 ? 0.04 : 0) + (avg - 2.9) * 0.3 + (S.vibe - 65) / 400 + ((S.autoBase || S.stance) === 'show' ? EXB2 : 0), 0.05, 0.3) * 0.96;
       else if (S.exec === 2 && S.execYears >= 2 && avg >= 3.0) p = 0.28;
       if (p > 0 && R() < p){
         if (S.away){ logItem('mile', S.away.place + ' 법인에서 성과를 인정받아 임원으로 귀국했다.'); S.away = null; }
@@ -5207,7 +5233,7 @@ function statsHTML(){
   h += csItem('궁합', S.rapport, S.rapport < 30 ? 'low' : 'warm');
   if (lvl(S) >= 1) h += csItem('분위기', S.vibe, S.vibe < 30 ? 'low' : 'teal');
   if (!S.exec && S.cl < 4) h += csItem('승격', S.pts / PTS_NEED * 100, 'warm', S.pts + '/' + PTS_NEED);
-  if (lvl(S) >= 1 && !S.away && (S.st.energy <= 15 || S.flags.zeroPrev)) h += '<p class="en-warn" role="status">⚠ ' + (S.flags.zeroPrev ? '옐로카드 상태예요. 올해 연말에도 에너지가 0이면 ' : '에너지 0으로 연말을 맞으면 옐로카드, 2년 연속이면 ') + (lvl(S) >= 3 ? '자리에서 물러나요(퇴임).' : '보직이 한 단계 내려가요.') + '<span>회복: 자세 ‘칼퇴 수호자’(연말 +9) · 휴가 사건에서 쉬는 선택지 · 에너지 채우는 부가활동(‘6시 정각 사무실 불 끄기’ 등) · ⚠ 표시 선택지 피하기</span></p>';
+  if (lvl(S) >= 1 && !S.away && (S.st.energy <= 25 || S.flags.zeroPrev)) h += '<p class="en-warn" role="status">⚠ ' + (S.flags.zeroPrev ? '옐로카드 상태예요. 올해 연말에도 에너지가 0이면 ' : '에너지 10 이하로 연말을 맞으면 옐로카드, 2년 연속이면 ') + (lvl(S) >= 3 ? '자리에서 물러나요(퇴임).' : '보직이 한 단계 내려가요.') + '<span>회복: 자세 ‘칼퇴 수호자’ · 휴가 사건에서 쉬는 선택지 · 에너지 채우는 부가활동(‘6시 정각 사무실 불 끄기’ 등) · ⚠ 표시 선택지 피하기</span></p>';
   return h;
 }
 function miniHTML(p){
@@ -5285,7 +5311,7 @@ function decisionHTML(){
     const hint = typeof o.hint === 'function' ? o.hint(S, d) : o.hint;
     const cf = o.confirm ? (typeof o.confirm === 'function' ? o.confirm(S, d) : o.confirm) : '';
     if (cf && P.confirmIdx === i) return '<div class="opt-cf" role="group"><p>' + esc(cf) + '</p><div class="cf-b"><button type="button" class="btn ink" data-opt="' + i + '">' + esc(o.confirmYes || '확인') + '</button><button type="button" class="btn" data-optback>다시 생각한다</button></div></div>';
-    const enWarn = !cf && L >= 1 && S.st.energy <= 15 && /에너지가 (조금 |크게 )?(줄|들)|에너지는? (줄|들)/.test(hint || '');
+    const enWarn = !cf && L >= 1 && S.st.energy <= 25 && /에너지가 (조금 |크게 )?(줄|들)|에너지는? (줄|들)/.test(hint || '');
     const tiltW = enWarn ? (tilt ? tilt.replace('<span class="chips tl">', '<span class="chips tl"><span class="chip warn">⚠ 에너지 바닥</span>') : '<span class="chips tl"><span class="chip warn">⚠ 에너지 바닥</span></span>') : tilt;
     return '<button type="button" class="opt' + (cf ? ' opt-end' : '') + '" ' + (cf ? 'data-optc' : 'data-opt') + '="' + i + '"><span class="ol">' + esc(optLabel(o)) + '</span>' + (hint ? '<span class="oh">' + esc(hint) + '</span>' : '') + (cf ? '<span class="chips tl"><span class="chip end">엔딩</span></span>' : tiltW) + '</button>';
   }).join('');
@@ -5330,7 +5356,7 @@ function modalHTML(){
   }
   if (P.type === 'yellow'){
     return '<p class="eyebrow">경고 · ' + esc(P.role) + '</p><h3 id="m-title">옐로카드: 에너지가 바닥난 채 한 해를 마쳤다</h3>' +
-      '<p>내년 연말에도 에너지가 0이면 ' + (P.exec ? '<b>자리에서 물러나야 해요(임원 퇴임 엔딩).</b>' : '<b>보직이 한 단계 내려가요.</b>') + ' 1 이상으로 회복하면 옐로카드는 사라져요.</p>' +
+      '<p>내년 연말에도 에너지가 10 이하면 ' + (P.exec ? '<b>자리에서 물러나야 해요(임원 퇴임 엔딩).</b>' : '<b>보직이 한 단계 내려가요.</b>') + ' 11 이상으로 회복하면 옐로카드는 사라져요.</p>' +
       '<div class="box"><p class="sub" style="margin:0 0 2px">회복하는 방법</p>' + EN_TIPS.map(t => '<p class="en-tip"><b>' + esc(t[0]) + '</b><span>' + esc(t[1]) + '</span></p>').join('') + '</div>' +
       '<div class="actions"><button type="button" class="btn-primary" data-close>확인</button></div>';
   }
