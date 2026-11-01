@@ -297,6 +297,11 @@ table.gt td.num{font-family:var(--f-mono)}
 .bar{height:6px;background:var(--sunk);border-radius:3px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--ink);transition:width .5s ease}
 .bar i.low{background:var(--bad)}
+.bar i.blink{animation:enblink 1.1s ease-in-out infinite}
+@keyframes enblink{50%{opacity:.35}}
+@media (prefers-reduced-motion: reduce){.bar i.blink{animation:none}}
+.en-warn{grid-column:1/-1;margin:4px 0 0;font-size:12px;line-height:1.5;color:var(--bad);font-weight:600}
+.chip.warn{color:var(--bad);border-color:var(--bad);font-weight:600}
 .bar i.warm{background:var(--amber)}
 .bar i.teal{background:var(--teal)}
 
@@ -746,7 +751,7 @@ table.gt td.num{font-family:var(--f-mono)}
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </div>
 
-<div class="ver-tag" aria-hidden="true">v23</div>
+<div class="ver-tag" aria-hidden="true">v24</div>
 <div id="bgm-box" class="bgm-box"><button type="button" id="bgm-btn" class="bgm-btn" aria-pressed="false">♪ 배경음악 꺼짐</button><button type="button" id="sfx-btn" class="bgm-btn" aria-pressed="false">효과음 꺼짐</button></div>
 <script>
 window.__g125ok = true;
@@ -4115,6 +4120,7 @@ const EPI_SPECIAL = [
 ];
 function epilogue(){
   const e = S.ending; const sp = EPI_SPECIAL.filter(x => x.c(S));
+  if (e.kind === 'exec_end' && S.flags.burnEnd) return '물러난 다음 달, 처음으로 아무 일정도 없는 월요일을 맞았다. 알람 없이 눈을 떴는데 7시 반이었다.';
   if (e.kind === 'exec_end' && S.flags.selfStep) return '스스로 물러난 다음 해 봄, 후임으로 적어 냈던 사람에게서 문자가 왔다. “그때 왜 저를 적으셨어요?” 답장은 아직 쓰는 중이다.';
   if (e.kind === 'exec_end' && S.flags.handover === e.year) return '인사 발표 전날 밤 써 둔 인수인계 문서 덕분에, 후임은 첫 주를 무사히 넘겼다. 퇴임 후 받은 문자 중 가장 고마운 문자였다.';
   if (sp.length && R() < 0.4) return pick(sp).t;
@@ -4910,8 +4916,22 @@ function checkDemotion(g){
   else if (rg.length >= 4 && rg.slice(-4).every(x => GPTS[x] <= 2)) logItem('note', '“요즘 존재감이 좀 약하네요.” 윗선에서 그런 말이 돈다고 한다.');
 }
 
+/* v24: 에너지 0으로 연말을 맞은 보직자 */
+function burnoutDown(S){
+  const was = ROLE_T[S.role]; const to = S.role - 1; const now = ROLE_T[to];
+  S.role = to; S.roleStart = S.year + 1; S.flags.noOffer = S.year + 2; S.cnt.burnDowns = (S.cnt.burnDowns || 0) + 1;
+  logItem('mile', '에너지가 바닥난 채 연말을 맞았다. ' + was + ' 자리를 내려놓았다.');
+  addPath(S, was + ' → ' + now + ' (번아웃)');
+  enqueue({type:'demote', title:was, now, why:'번아웃', text:'에너지가 0인 채로 연말을 맞았다. ' + was + ' 자리를 내려놓고 ' + euro(now) + ' 돌아간다. 2년 동안은 보직 제안이 오지 않는다.'});
+  changeBoss(S, 'selfDown'); resetActs(S);
+}
 function yearEnd(){
   S.month = 12;
+  let burnEnd = false;
+  if (!S.away && lvl(S) >= 1 && S.st.energy < 1){
+    if (lvl(S) >= 3){ burnEnd = true; S.flags.burnEnd = 1; logItem('mile', '에너지가 바닥난 채 연말을 맞았다. 자리에서 물러나기로 했다.'); }
+    else burnoutDown(S);
+  }
   const awayRest = S.away && S.away.group === 'rest';
   const L = lvl(S);
   const SD = STANCE[S.stance];
@@ -4949,7 +4969,7 @@ function yearEnd(){
   S.tenure++; S.tenureInTeam++; S.tenureInDept++; S.yrsInLevel++; S.age++;
   if (S.exec) S.execYears++;
 
-  let end = null;
+  let end = burnEnd ? 'exec_end' : null;
   if (awayRest){ logItem('note', S.away.kind + ' 중이라 올해는 고과가 없다.'); }
   else {
     const r = computeGrade();
@@ -5165,10 +5185,12 @@ function leadHTML(){
 }
 function renderStats(){ const h = statsHTML(); $('#p-stats').innerHTML = h; $('#p-stats2').innerHTML = h; }
 function statsHTML(){
-  let h = ['skill','rep','energy','sat'].map(k => { const v = S.st[k]; return csItem(ST[k], v, (k === 'energy' || k === 'sat') && v < 30 ? 'low' : ''); }).join('');
+  const enDanger = lvl(S) >= 1 && !S.away && S.st.energy <= 15;
+  let h = ['skill','rep','energy','sat'].map(k => { const v = S.st[k]; return csItem(ST[k], v, k === 'energy' && enDanger ? 'low blink' : (k === 'energy' || k === 'sat') && v < 30 ? 'low' : ''); }).join('');
   h += csItem('궁합', S.rapport, S.rapport < 30 ? 'low' : 'warm');
   if (lvl(S) >= 1) h += csItem('분위기', S.vibe, S.vibe < 30 ? 'low' : 'teal');
   if (!S.exec && S.cl < 4) h += csItem('승격', S.pts / PTS_NEED * 100, 'warm', S.pts + '/' + PTS_NEED);
+  if (lvl(S) >= 1 && !S.away && S.st.energy <= 15) h += '<p class="en-warn" role="status">⚠ 에너지가 0인 채로 연말을 맞으면 ' + (lvl(S) >= 3 ? '자리에서 물러나요' : '보직이 한 단계 내려가요') + '. 휴가 선택지나 ‘이틀 쉰다’로 회복할 수 있어요.</p>';
   return h;
 }
 function miniHTML(p){
@@ -5246,7 +5268,9 @@ function decisionHTML(){
     const hint = typeof o.hint === 'function' ? o.hint(S, d) : o.hint;
     const cf = o.confirm ? (typeof o.confirm === 'function' ? o.confirm(S, d) : o.confirm) : '';
     if (cf && P.confirmIdx === i) return '<div class="opt-cf" role="group"><p>' + esc(cf) + '</p><div class="cf-b"><button type="button" class="btn ink" data-opt="' + i + '">' + esc(o.confirmYes || '확인') + '</button><button type="button" class="btn" data-optback>다시 생각한다</button></div></div>';
-    return '<button type="button" class="opt' + (cf ? ' opt-end' : '') + '" ' + (cf ? 'data-optc' : 'data-opt') + '="' + i + '"><span class="ol">' + esc(optLabel(o)) + '</span>' + (hint ? '<span class="oh">' + esc(hint) + '</span>' : '') + (cf ? '<span class="chips tl"><span class="chip end">엔딩</span></span>' : tilt) + '</button>';
+    const enWarn = !cf && L >= 1 && S.st.energy <= 15 && /에너지가 (조금 |크게 )?(줄|들)|에너지는? (줄|들)/.test(hint || '');
+    const tiltW = enWarn ? (tilt ? tilt.replace('<span class="chips tl">', '<span class="chips tl"><span class="chip warn">⚠ 에너지 바닥</span>') : '<span class="chips tl"><span class="chip warn">⚠ 에너지 바닥</span></span>') : tilt;
+    return '<button type="button" class="opt' + (cf ? ' opt-end' : '') + '" ' + (cf ? 'data-optc' : 'data-opt') + '="' + i + '"><span class="ol">' + esc(optLabel(o)) + '</span>' + (hint ? '<span class="oh">' + esc(hint) + '</span>' : '') + (cf ? '<span class="chips tl"><span class="chip end">엔딩</span></span>' : tiltW) + '</button>';
   }).join('');
   return '<div class="event' + (e.chain ? ' chainev' : '') + '" id="event-card"><p class="eyebrow">' + tagL + (e.chain ? '' : '결정 · ') + S.year + '년 ' + P.month + '월</p><h3>' + esc(evTitle(e, d)) + '</h3><p class="body">' + esc(e.body(S, d)) + '</p><div class="opts">' + opts + '</div>' + (S.auto ? '<p class="autonote">자동 결정이 켜져 있어 잠시 뒤 이 사람의 상태에 따라 고릅니다.</p>' : '') + '</div>';
 }
