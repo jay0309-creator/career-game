@@ -370,8 +370,6 @@ table.gt td.num{font-family:var(--f-mono)}
 .lv-c span{display:block;font-family:var(--f-mono);font-size:10.5px;color:var(--ink-2);margin-bottom:2px}
 .it.levalit::before{content:"평가";font-family:var(--f-mono);font-size:10.5px;border:1px solid var(--ink-2);color:var(--ink-2);border-radius:3px;padding:0 4px;margin-right:6px;vertical-align:1px}
 .bgm-box{position:fixed;right:max(12px, env(safe-area-inset-right, 0px));bottom:max(12px, env(safe-area-inset-bottom, 0px));z-index:30;display:flex;align-items:center;gap:8px}
-.bgm-box input[type=range]{width:110px;accent-color:var(--amber);background:var(--surface);border-radius:999px;padding:6px 8px;border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.12);height:30px}
-@media (max-width:480px){.bgm-box input[type=range]{width:84px}}
 .bgm-btn{font:600 12.5px var(--f-body);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 12px;box-shadow:0 4px 14px rgba(0,0,0,.12);cursor:pointer}
 .bgm-btn:hover{border-color:var(--ink)}
 .bgm-btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
@@ -747,7 +745,7 @@ table.gt td.num{font-family:var(--f-mono)}
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </div>
 
-<div id="bgm-box" class="bgm-box"><input type="range" id="bgm-vol" min="0" max="100" step="5" value="60" aria-label="음량" hidden><button type="button" id="bgm-btn" class="bgm-btn" aria-pressed="false">♪ 소리 꺼짐</button></div>
+<div id="bgm-box" class="bgm-box"><button type="button" id="bgm-btn" class="bgm-btn" aria-pressed="false">♪ 배경음악 꺼짐</button><button type="button" id="sfx-btn" class="bgm-btn" aria-pressed="false">효과음 꺼짐</button></div>
 <script>
 window.__g125ok = true;
 (function(){
@@ -4442,15 +4440,14 @@ function leadEndHTML(){
 const BGM = (() => {
   let ctx = null, master = null, sfx = null, noiseBuf = null, timer = null, nextT = 0, step = 0, scene = 'intro', want = 'intro', switchAt = 0, on = false;
   const rnd = Math.random; // 게임 난수(R)는 건드리지 않는다
-  const vol = () => { const v = Number(store.get('g125-vol', 60)); return isFinite(v) ? clamp(v, 0, 100) : 60; };
-  const musicVol = () => 0.55 * vol() / 60 + 0.0001;
+  const VOL = 0.55;
   const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
   function build(){
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
     ctx = new AC();
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2000; lp.Q.value = 0.3;
     master = ctx.createGain(); master.gain.value = 0; master.connect(lp); lp.connect(ctx.destination);
-    sfx = ctx.createGain(); sfx.gain.value = vol() / 60; sfx.connect(ctx.destination);
+    sfx = ctx.createGain(); sfx.gain.value = 1; sfx.connect(ctx.destination);
     noiseBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.08), ctx.sampleRate);
     const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = rnd() * 2 - 1;
     return true;
@@ -4497,7 +4494,7 @@ const BGM = (() => {
     if (!ctx || !on) return;
     if (want !== scene && ctx.currentTime >= switchAt){
       scene = want; step = 0;
-      master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(0.0001, ctx.currentTime); master.gain.linearRampToValueAtTime(musicVol(), ctx.currentTime + 1.8);
+      master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(0.0001, ctx.currentTime); master.gain.linearRampToValueAtTime(VOL, ctx.currentTime + 1.8);
     }
     const sg = SONG[scene]; const e8 = 60 / sg.bpm / 2;
     if (nextT < ctx.currentTime - 0.2) nextT = ctx.currentTime + 0.05;
@@ -4507,8 +4504,10 @@ const BGM = (() => {
       nextT += e8; step++;
     }
   }
+  const fxOn = () => store.get('g125-sfx', false) === true;
+  const bgOn = () => store.get('g125-bgm', false) === true;
   function seq(notes, gap, type, vol, last){
-    if (!ctx || !on) return;
+    if (!ctx || !fxOn()) return;
     let t = ctx.currentTime + 0.05;
     notes.forEach((m, k) => { (Array.isArray(m) ? m : [m]).forEach(x => note(t, x, k === notes.length - 1 ? (last || 0.9) : gap * 1.6, type, vol, 0.01, sfx)); t += gap; });
   }
@@ -4522,11 +4521,11 @@ const BGM = (() => {
     g2.gain.setValueAtTime(vol * 0.5, t); g2.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
     s.connect(f); f.connect(g2); g2.connect(sfx); s.start(t);
   }
+  function wakeCtx(){ if (!ctx && !build()) return false; if (ctx.state === 'suspended') ctx.resume(); return true; }
   function start(){
-    if (!ctx && !build()) return false;
-    if (ctx.state === 'suspended') ctx.resume();
+    if (!wakeCtx()) return false;
     on = true; scene = want; step = 0; nextT = ctx.currentTime + 0.08;
-    master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(0.0001, ctx.currentTime); master.gain.linearRampToValueAtTime(musicVol(), ctx.currentTime + 1.5);
+    master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(0.0001, ctx.currentTime); master.gain.linearRampToValueAtTime(VOL, ctx.currentTime + 1.5);
     clearInterval(timer); timer = setInterval(tick, 40); tick();
     return true;
   }
@@ -4535,19 +4534,12 @@ const BGM = (() => {
     if (ctx){ master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value, ctx.currentTime); master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3); }
   }
   function label(){
-    const b = document.getElementById('bgm-btn'); if (!b) return;
-    const p = store.get('g125-bgm', false) === true;
-    b.setAttribute('aria-pressed', p ? 'true' : 'false'); b.textContent = p ? '♪ 소리 켜짐' : '♪ 소리 꺼짐';
-    const r = document.getElementById('bgm-vol'); if (r){ r.hidden = !p; r.value = vol(); }
-  }
-  function setVol(v){
-    store.set('g125-vol', v);
-    if (!ctx) return;
-    sfx.gain.setTargetAtTime(v / 60, ctx.currentTime, 0.05);
-    if (on && want === scene){ master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setTargetAtTime(musicVol(), ctx.currentTime, 0.08); }
+    const b = document.getElementById('bgm-btn'), f = document.getElementById('sfx-btn');
+    if (b){ b.setAttribute('aria-pressed', bgOn() ? 'true' : 'false'); b.textContent = bgOn() ? '♪ 배경음악 켜짐' : '♪ 배경음악 꺼짐'; }
+    if (f){ f.setAttribute('aria-pressed', fxOn() ? 'true' : 'false'); f.textContent = fxOn() ? '효과음 켜짐' : '효과음 꺼짐'; }
   }
   function click(kind){
-    if (!ctx || !on) return;
+    if (!ctx || !fxOn()) return;
     const t = ctx.currentTime + 0.005;
     if (kind === 'stamp') thud(t, 170, 0.09);
     else if (kind === 'double'){ thud(t, 170, 0.09); thud(t + 0.13, 150, 0.09); }
@@ -4557,7 +4549,7 @@ const BGM = (() => {
   }
   /* 사람이 직접 누른 버튼에만 소리를 낸다 (자동 결정에는 소리 없음) */
   function onClick(e){
-    if (!e.isTrusted || !on) return;
+    if (!e.isTrusted || !fxOn()) return;
     if (e.target.closest('#bgm-box')) return;
     const el = e.target.closest('button, [role="button"], label, summary, select'); if (!el) return;
     if (el.closest('.opt-cf') && el.hasAttribute('data-opt')) return click('double');
@@ -4567,15 +4559,17 @@ const BGM = (() => {
     click('tap');
   }
   return {
-    toggle(){ const p = !(store.get('g125-bgm', false) === true); store.set('g125-bgm', p); if (p){ start(); click('tap'); } else stop(); label(); },
+    toggle(){ const p = !bgOn(); store.set('g125-bgm', p); if (p) start(); else stop(); label(); },
+    toggleFx(){ const p = !fxOn(); store.set('g125-sfx', p); if (p && wakeCtx()) click('tap'); label(); },
     init(){
       label();
       const b = document.getElementById('bgm-btn'); if (b) b.addEventListener('click', e => { e.stopPropagation(); BGM.toggle(); });
-      const wake = e => { if (e.target.closest && e.target.closest('#bgm-box')) return; document.removeEventListener('pointerdown', wake, true); if (!on && store.get('g125-bgm', false) === true) start(); };
-      if (store.get('g125-bgm', false) === true) document.addEventListener('pointerdown', wake, true);
-      const r = document.getElementById('bgm-vol'); if (r) r.addEventListener('input', () => setVol(Number(r.value)));
+      const f = document.getElementById('sfx-btn'); if (f) f.addEventListener('click', e => { e.stopPropagation(); BGM.toggleFx(); });
+      // 켜 둔 설정이면, 브라우저 정책상 첫 클릭 때 시작한다
+      const wake = e => { if (e.target.closest && e.target.closest('#bgm-box')) return; document.removeEventListener('pointerdown', wake, true); if (bgOn() && !on) start(); else if (fxOn()) wakeCtx(); };
+      if (bgOn() || fxOn()) document.addEventListener('pointerdown', wake, true);
       document.addEventListener('click', onClick, true);
-      document.addEventListener('visibilitychange', () => { if (!ctx) return; if (document.hidden) ctx.suspend(); else if (on) ctx.resume(); });
+      document.addEventListener('visibilitychange', () => { if (!ctx) return; if (document.hidden) ctx.suspend(); else if (on || fxOn()) ctx.resume(); });
     },
     /* 곡 바꾸기: 지금 곡을 1.2초 동안 줄인 뒤 다음 곡으로 넘어간다 */
     scene(s){
@@ -4588,8 +4582,8 @@ const BGM = (() => {
     fanfare(){ seq([60, 64, 67, [72, 76, 79]], 0.11, 'triangle', 0.045, 1.1); },
     grade(g){ if (g === '가' || g === '나') seq([67, 71, 74, [79, 83]], 0.1, 'triangle', 0.04, 0.9); else if (g === '라' || g === '마') seq([64, 61, [58, 53]], 0.18, 'sine', 0.045, 1.2); else seq([67, [72, 76]], 0.14, 'sine', 0.035, 0.7); },
     sad(){ seq([62, 58, [55, 50]], 0.2, 'sine', 0.045, 1.3); },
-    roll(){ if (ctx && on) note(ctx.currentTime + 0.005, 91 + Math.floor(rnd() * 5), 0.03, 'triangle', 0.012, 0.002, sfx); },
-    set(k){ if (ctx && on) note(ctx.currentTime + 0.005, [72, 74, 76, 79, 81, 84, 86, 88, 91][k % 9], 0.35, 'sine', 0.03, 0.005, sfx); }
+    roll(){ if (ctx && fxOn()) note(ctx.currentTime + 0.005, 91 + Math.floor(rnd() * 5), 0.03, 'triangle', 0.012, 0.002, sfx); },
+    set(k){ if (ctx && fxOn()) note(ctx.currentTime + 0.005, [72, 74, 76, 79, 81, 84, 86, 88, 91][k % 9], 0.35, 'sine', 0.03, 0.005, sfx); }
   };
 })();
 /* ---------- popup queue ---------- */
