@@ -449,6 +449,10 @@ table.gt td.num{font-family:var(--f-mono)}
 @keyframes rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @keyframes stamp{to{opacity:1;transform:rotate(-9deg) scale(1)}}
 @keyframes drain{to{width:0}}
+.tbar{height:5px;background:var(--sunk);margin:-22px -22px -4px;border-radius:14px 14px 0 0;overflow:hidden}
+.tbar i{display:block;height:100%;width:100%;background:var(--amber);animation-name:drain;animation-timing-function:linear;animation-fill-mode:forwards}
+.tnote{font-size:12px;color:var(--ink-2);align-self:center}
+.tpin{margin:0}
 
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);z-index:50;background:var(--ink);color:var(--paper);border-radius:10px;padding:10px 16px;font-weight:600;font-size:14px;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgba(0,0,0,.18)}
 .toast b{color:var(--amber)}
@@ -760,7 +764,7 @@ table.gt td.num{font-family:var(--f-mono)}
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </div>
 
-<div class="ver-tag" aria-hidden="true">v28</div>
+<div class="ver-tag" aria-hidden="true">v29</div>
 <div id="bgm-box" class="bgm-box"><button type="button" id="bgm-btn" class="bgm-btn" aria-pressed="false">♪ 배경음악 꺼짐</button><button type="button" id="sfx-btn" class="bgm-btn" aria-pressed="false">효과음 꺼짐</button></div>
 <script>
 window.__g125ok = true;
@@ -3537,8 +3541,8 @@ function newGame(){
 /* ---------- v9: 보직별 부가활동 (최대 2개, 연말에 1년치 적용) ---------- */
 const ACTS = {
   0:[
-    {id:'cert', label:'퇴근 후 자격증 학원', gain:'2년 연속이면 취득: 역량 +8 · 평판 +2', cost:'에너지 −3', d:{energy:-3}, done:2, reward:{skill:8, rep:2}, doneText:'자격증을 땄다. 합격 문자를 세 번 다시 읽었다.', hap:[['시험 전날 그룹장이 회식을 잡았다.', {energy:-2}]]},
-    {id:'lang', label:'새벽 6시 전화영어', gain:'3년 연속이면 등급 취득: 역량 +3 · 해외 관련 사건 2배', cost:'에너지 −2 · 만족 −1', d:{energy:-2, sat:-1}, done:3, reward:{skill:3}, flag:'langDone', doneText:'어학 등급을 땄다. 해외 공고가 눈에 들어오기 시작했다.', hap:[['졸면서 ‘Yes’만 열두 번 했다.', {}]]},
+    {id:'cert', label:'퇴근 후 자격증 학원', gain:'역량 +4 · 평판 +1 · 2년마다 자격증 하나', cost:'에너지 −3', d:{energy:-3}, done:2, reward:{skill:8, rep:2}, doneText:'자격증을 땄다. 합격 문자를 세 번 다시 읽었다.', hap:[['시험 전날 그룹장이 회식을 잡았다.', {energy:-2}]]},
+    {id:'lang', label:'새벽 6시 전화영어', gain:'역량 +1 · 3년째부터 해외 관련 사건 2배', cost:'에너지 −2 · 만족 −1', d:{energy:-2, sat:-1}, done:3, reward:{skill:3}, flag:'langDone', doneText:'어학 등급을 땄다. 해외 공고가 눈에 들어오기 시작했다.', hap:[['졸면서 ‘Yes’만 열두 번 했다.', {}]]},
     {id:'gym', label:'점심시간 헬스장 오픈런', gain:'에너지 +4 · 만족 +1', cost:'역량 −1', d:{energy:4, sat:1, skill:-1}, hap:[['점심은 단백질 셰이크. 오후 회의에서 배가 울렸다.', {}]]},
     {id:'hike', label:'주말마다 상사 등산 따라가기', gain:'궁합 +4', cost:'에너지 −3 · 만족 −2', d:{rap:4, energy:-3, sat:-2}, hap:[['정상에서 업무 지시를 받았다. 하산이 길었다.', {energy:-1}]]},
     {id:'beans', label:'탕비실 커피머신 관리 담당', gain:'평판 +2', cost:'에너지 −1', d:{rep:2, energy:-1}, hap:[['원두가 떨어진 날, 층 전체의 원망을 받았다.', {rep:-2}]]}
@@ -3551,7 +3555,7 @@ const ACTS = {
     {id:'lights', label:'6시 정각 사무실 불 끄기', gain:'분위기 +3 · 에너지 +2', cost:'궁합은 상사 성향 따라 ±', d:{vibe:3, energy:2}, hap:[['불을 끄다 그룹장과 눈이 마주쳤다.', {}]]}
   ],
   2:[
-    {id:'coach', label:'파트장 코칭', gain:'분위기 +2 · 평판 +1 · 3년 연속이면 보상', cost:'에너지 −2', d:{vibe:2, rep:1, energy:-2}, done:3, reward:{rep:3, vibe:3}, doneText:'코칭하던 파트장이 그룹장으로 승진했다. 축하 자리에서 내 이름이 불렸다.', hap:[]},
+    {id:'coach', label:'파트장 코칭', gain:'분위기 +3 · 평판 +2', cost:'에너지 −2', d:{vibe:2, rep:1, energy:-2}, done:3, reward:{rep:3, vibe:3}, doneText:'코칭하던 파트장이 그룹장으로 승진했다. 축하 자리에서 내 이름이 불렸다.', hap:[]},
     {id:'ally', label:'옆 그룹장과 커피 동맹', gain:'평판 +3', cost:'에너지 −2', d:{rep:3, energy:-2}, hap:[['커피 동맹이 회의실 쟁탈전에서 깨졌다.', {rep:-1}]]},
     {id:'rehearse', label:'팀장 보고 전 리허설 3회', gain:'궁합 +3', cost:'분위기 −2', d:{rap:3, vibe:-2}, hap:[['리허설이 본 보고보다 길었다.', {energy:-1}]]},
     {id:'timer', label:'회의 30분 타이머 도입', gain:'분위기 +3 · 에너지 +1', cost:'궁합 −1 (회의 중독 상사면 −3)', d:{vibe:3, energy:1, rap:-1}, hap:[['타이머가 울렸는데 팀장이 ‘연장’을 눌렀다.', {}]]},
@@ -3565,7 +3569,7 @@ const ACTS = {
     {id:'heir', label:'후계자 육성', gain:'분위기 +2 · 재신임 탈락 확률↓', cost:'에너지 −2', d:{vibe:2, energy:-2}, hap:[['후계자가 나보다 보고를 잘했다. 기쁘면서 슬펐다.', {}]]}
   ]
 };
-const ACT_NOTE = {cert:'2년 연속하면 취득 · 역량 +8 평판 +2', lang:'3년 연속하면 등급 취득 · 역량 +3, 해외 관련 사건 두 배', lights:'궁합은 상사 성향에 따라 달라요', coach:'3년 연속하면 보상 · 평판 +3 분위기 +3', timer:'회의 중독 상사면 궁합 −3', heir:'임원 재신임 탈락 확률이 낮아져요'};
+const ACT_NOTE = {cert:'매년 조금씩 오르고, 2년마다 자격증을 하나 따요', lang:'매년 조금씩 오르고, 3년째부터 해외 관련 사건이 두 배', lights:'궁합은 상사 성향에 따라 달라요', coach:'매년 조금씩 오르고, 3년마다 코칭한 파트장이 승진해요', timer:'회의 중독 상사면 궁합 −3', heir:'임원 재신임 탈락 확률이 낮아져요'};
 function actChipsHTML(a, prog){
   const d = a.d; const ks = Object.keys(d).sort((x, y) => (d[y] > 0) - (d[x] > 0));
   let h = ks.map(k => '<span class="chip ' + (d[k] > 0 ? 'up' : 'down') + '">' + ST[k] + ' ' + (d[k] > 0 ? '+' : '') + d[k] + '</span>').join('');
@@ -3603,16 +3607,17 @@ function applyActs(S){
     const a = actById(S, id); if (!a) return;
     names.push(a.label);
     const d = actDelta(S, a); Object.keys(d).forEach(k => { sum[k] = (sum[k] || 0) + d[k]; });
+    if (a.done && a.reward) Object.keys(a.reward).forEach(k => { sum[k] = (sum[k] || 0) + Math.round(a.reward[k] / a.done); });
     S.actYears[id] = (S.actYears[id] || 0) + 1;
   });
   logItem('rap', '부가활동 1년치 · ' + names.join(', '), {chips:add(S, sum)});
   S.acts.slice().forEach(id => {
     const a = actById(S, id); if (!a) return;
-    if (a.done && S.actYears[id] >= a.done){
-      logItem('mile', a.doneText, {});
-      add(S, a.reward); if (a.flag) S.flags[a.flag] = 1;
-      S.acts = S.acts.filter(x => x !== id); delete S.actYears[id];
-      toast('부가활동 완료 · <b>' + esc(a.label) + '</b>');
+    if (a.done && S.actYears[id] % a.done === 0){
+      const n = S.actYears[id] / a.done;
+      logItem('mile', (n > 1 ? '(' + n + '번째) ' : '') + a.doneText, {});
+      if (a.flag) S.flags[a.flag] = 1;
+      toast('부가활동 · <b>' + esc(a.label) + '</b> ' + S.actYears[id] + '년째');
     } else if (a.hap && a.hap.length && R() < 0.15){
       const h = pick(a.hap); logItem('rap', h[0], {chips:add(S, h[1])});
     }
@@ -3622,7 +3627,7 @@ let actsOpen = false;
 function setUiHold(v){ uiHold = !!v; const h = document.getElementById('c-hold'); if (h) h.hidden = !uiHold; }
 function actsSummary(S){
   const names = S.acts.map(id => { const a = actById(S, id); return a ? a.label : ''; }).filter(Boolean);
-  const prog = S.acts.map(id => { const a = actById(S, id); return a && a.done ? (a.label.split(' ').slice(-1)[0] + ' ' + (S.actYears[id] || 0) + '/' + a.done + '년') : ''; }).filter(Boolean);
+  const prog = [];
   return '부가활동 ' + names.length + '/2 · ' + (names.length ? esc(names.join(', ')) : '아직 안 고름') + (prog.length ? ' · ' + esc(prog.join(', ')) : '');
 }
 function actsHTML(){
@@ -3630,7 +3635,7 @@ function actsHTML(){
   if (!actsOpen) return h;
   h += '<div class="ac-list">' + actList(S).map(a => {
     const on = S.acts.indexOf(a.id) >= 0;
-    const prog = a.done ? ' · 진행 ' + (on ? (S.actYears[a.id] || 0) : 0) + '/' + a.done + '년' : '';
+    const prog = a.done && on && S.actYears[a.id] ? ' · ' + S.actYears[a.id] + '년째' : '';
     return '<button type="button" class="ac' + (on ? ' on' : '') + '" data-act="' + a.id + '" aria-pressed="' + on + '"><b>' + (on ? '✓ ' : '') + esc(a.label) + '</b>' + actChipsHTML(a, prog) + '</button>';
   }).join('') + '</div><p class="help">2개까지 켤 수 있어요. 연말에 켜져 있는 활동만 1년치 효과가 적용되고, 끄면 진행이 처음부터예요. 이 칸이 열려 있는 동안은 시간이 멈춰요.</p><div><button type="button" class="btn" data-acts-done>선택 완료</button></div>';
   return h;
@@ -4107,7 +4112,7 @@ function cohortHTML(P){
   h += '<div class="coh">' + P.rows.map(r => '<div class="coh-r"><b>' + esc(r.name) + '</b><span class="coh-s">' + esc(r.st) + '</span><span class="coh-n">' + esc(r.note) + '</span></div>').join('') + '</div>';
   if (P.intro) h += '<p class="sub">' + (P.exp ? '' : '동기 단톡방 인원 ' + P.chat + '명. ') + '5년마다 동기 모임에서 다시 만나요.</p>';
   else h += '<div class="coh-r me"><b>나</b><span class="coh-s">' + esc(P.me) + '</span></div>' + (P.say ? '<p class="coh-say"><span>' + esc(P.say.who) + '</span>“' + esc(P.say.text) + '”</p>' : '') + '<p class="coh-end">' + esc(P.end) + '</p>';
-  return h + '<div class="actions"><button type="button" class="btn-primary" data-close>확인</button></div>';
+  return timedBarHTML(P) + h + '<div class="actions"><button type="button" class="btn-primary" data-close>확인</button>' + (P.tm ? '<span class="tnote">' + (P.tm.pin ? '고정했어요 · 다 읽으면 확인' : '10초 뒤 닫혀요 · 카드를 누르면 고정') + '</span>' : '') + '</div>';
 }
 const COH_RET = {ace:'퇴직 후에도 동기 모임 날짜는 여전히 이 친구가 잡는다.', steady:'마지막 날까지 같은 속도로 일했다고 한다.', home:'퇴직하는 날도 6시 정각에 나갔다고 한다.', jump:'“이번엔 진짜 옮길 거야.” 결국 정년까지 있었다.', global:'퇴직 후 해외에서 한 달 살기를 하고 있다.'};
 function cohortEndHTML(){
@@ -4635,6 +4640,8 @@ function showNextPopup(){
     return;
   }
   S.pending = Object.assign({modal:true}, it); S.ff = false;
+  if (it.type === 'burn') timedArm(S.pending, 5000);
+  else if (it.type === 'cohort' && !it.intro) timedArm(S.pending, 10000);
   try { if (it.type === 'grade') BGM.grade(it.g); else if (it.type === 'promo' || it.type === 'role') BGM.fanfare(); else if (it.type === 'demote' || it.type === 'yellow') BGM.sad(); } catch (e) {}
   renderPlay();
   if (it.type === 'grade') armGrade();
@@ -4646,8 +4653,30 @@ function armGrade(){
   if (S.pending.reveal){ if (S.auto) gradeT = setTimeout(autoReveal, 2500 / S.speed); return; }
   gradeT = setTimeout(closePopup, gradeDur(S.pending));
 }
+/* v29: 몇 초 뒤 자동으로 닫히는 창. 동기 모임은 카드를 누르면 닫히지 않게 고정 */
+let timedT = null;
+function timedArm(P, ms){ clearTimeout(timedT); P.tm = {ms, left:ms, at:performance.now(), run:true, pin:false}; timedT = setTimeout(timedFire, ms); }
+function timedFire(){ timedT = null; if (S && S.pending && S.pending.tm && S.pending.tm.run) closePopup(); }
+function timedLeft(tm){ return tm.run ? Math.max(0, tm.left - (performance.now() - tm.at)) : tm.left; }
+function timedBarHTML(P){
+  const tm = P.tm; if (!tm) return '';
+  if (tm.pin) return '';
+  const left = timedLeft(tm);
+  return '<div class="tbar" aria-hidden="true"><i style="animation-duration:' + tm.ms + 'ms;animation-delay:-' + Math.round(tm.ms - left) + 'ms;animation-play-state:' + (tm.run ? 'running' : 'paused') + '"></i></div>';
+}
+function timedPause(pin){
+  const P = S && S.pending; if (!P || !P.tm || P.tm.pin) return;
+  if (P.tm.run){ clearTimeout(timedT); P.tm.left = timedLeft(P.tm); P.tm.run = false; }
+  if (pin){ P.tm.pin = true; $('#mcard').innerHTML = modalHTML(); return; }
+  const i = $('#mcard .tbar i'); if (i) i.style.animationPlayState = 'paused';
+}
+function timedResume(){
+  const P = S && S.pending; if (!P || !P.tm || P.tm.run || P.tm.pin) return;
+  P.tm.at = performance.now(); P.tm.run = true; clearTimeout(timedT); timedT = setTimeout(timedFire, Math.max(400, P.tm.left));
+  const i = $('#mcard .tbar i'); if (i) i.style.animationPlayState = 'running';
+}
 function closePopup(){
-  clearTimeout(gradeT);
+  clearTimeout(gradeT); clearTimeout(timedT);
   if (!S || !S.pending || !S.pending.modal) return;
   if (S.pending.type === 'acts'){ S.acts = (S.pending.sel || []).slice(0, 2); S.actYears = {}; }
   S.pending = null;
@@ -4965,12 +4994,33 @@ const EXB2 = 0.04;
 const SLD = {social:[0, -1, -3, -3, -3, -3], show:[0, -1, -2, -2, -2, -2]};
 function stanceLvDrain(S, L){ const a = SLD[S.stance]; return a && !S.away ? a[Math.min(L, 5)] : 0; }
 /* v24: 에너지 0으로 연말을 맞은 보직자 */
+/* v29: 두 번째 옐로카드 안내창. 판마다(그리고 한 판 안에서도) 겹치지 않게 고른다 */
+const BURN = [
+  {id:'er', t:'새벽 3시, 응급실', b:'주간회의 자료를 마무리하다 눈앞이 하얘졌다. 수액을 맞는 두 시간 동안 처음으로 메신저 알림을 껐다.'},
+  {id:'farm', t:'시골에서 한 달', b:'남은 연차를 몰아 쓰고 시골 마을에서 한 달을 살았다. 인터넷이 잘 안 터져서 밀린 메일은 돌아와서 한 번에 읽었다. 세상은 생각보다 잘 돌아가고 있었다.'},
+  {id:'subway', t:'종점입니다', b:'퇴근길 지하철에서 잠들었다 깨 보니 종점이었다. 이번 주에만 세 번째였다. 그날 밤 휴가 신청서를 썼다.'},
+  {id:'plant', t:'책상 위 다육이', b:'3년 키운 다육이가 바싹 말라 있었다. 언제부터였는지 기억나지 않았다. 그 주에 처음으로 6시에 퇴근했다.'},
+  {id:'forest', t:'휴대폰 없는 2주', b:'휴대폰을 맡기는 산속 휴양림에서 2주를 보냈다. 첫 사흘은 메일 오는 꿈을 꿨고, 마지막 날엔 사내 시스템 비밀번호가 기억나지 않았다.'}
+];
+const BURN_EN = 25;
+function burnPick(S){
+  const used = S.flags.burnSeen || (S.flags.burnSeen = []);
+  let pool = BURN.filter(x => used.indexOf(x.id) < 0); if (!pool.length) pool = BURN.slice();
+  let seen = store.get('g125-burn', []); if (!Array.isArray(seen)) seen = [];
+  let fresh = pool.filter(x => seen.indexOf(x.id) < 0);
+  if (!fresh.length){ seen = seen.filter(id => !pool.some(x => x.id === id)); fresh = pool; }
+  const b = pick(fresh); used.push(b.id); seen.push(b.id); store.set('g125-burn', seen);
+  return b;
+}
 function burnoutDown(S){
   const was = ROLE_T[S.role]; const to = S.role - 1; const now = ROLE_T[to];
   S.role = to; S.roleStart = S.year + 1; S.flags.noOffer = S.year + 2; S.cnt.burnDowns = (S.cnt.burnDowns || 0) + 1;
   logItem('mile', '2년 연속 에너지가 바닥난 채 연말을 맞았다. ' + was + ' 자리를 내려놓았다.');
   addPath(S, was + ' → ' + now + ' (번아웃)');
-  enqueue({type:'demote', title:was, now, why:'번아웃', text:'2년 연속 에너지가 10 이하인 채로 연말을 맞았다. ' + was + ' 자리를 내려놓고 ' + euro(now) + ' 돌아간다. 2년 동안은 보직 제안이 오지 않는다.'});
+  const bn = burnPick(S); const bch = add(S, {energy:BURN_EN});
+  logItem('note', bn.t + ' · ' + bn.b, {chips:bch});
+  enqueue({type:'burn', t:bn.t, b:bn.b, exec:false, chips:bch});
+  enqueue({type:'demote', title:was, now, why:'번아웃', text:'2년 연속 에너지가 10 이하인 채로 연말을 맞았다. ' + was + ' 자리를 내려놓고 ' + euro(now) + ' 돌아간다. 쉬면서 에너지를 조금 되찾았다. 2년 동안은 보직 제안이 오지 않는다.'});
   changeBoss(S, 'selfDown'); resetActs(S);
 }
 function yearEnd(){
@@ -4979,7 +5029,7 @@ function yearEnd(){
   const zeroNow = !S.away && lvl(S) >= 1 && S.st.energy <= 10;
   if (zeroNow && S.flags.zeroPrev){
     S.flags.zeroPrev = false;
-    if (lvl(S) >= 3){ burnEnd = true; S.flags.burnEnd = 1; logItem('mile', '2년 연속 에너지가 바닥난 채 연말을 맞았다. 자리에서 물러나기로 했다.'); }
+    if (lvl(S) >= 3){ burnEnd = true; S.flags.burnEnd = 1; const bn = burnPick(S); logItem('note', bn.t + ' · ' + bn.b); enqueue({type:'burn', t:bn.t, b:bn.b, exec:true}); logItem('mile', '2년 연속 에너지가 바닥난 채 연말을 맞았다. 자리에서 물러나기로 했다.'); }
     else burnoutDown(S);
   } else if (zeroNow){
     S.flags.zeroPrev = true; S.cnt.yellow = (S.cnt.yellow || 0) + 1;
@@ -5397,6 +5447,11 @@ function modalHTML(){
       '<div class="box"><p class="sub" style="margin:0 0 2px">회복하는 방법</p>' + EN_TIPS.map(t => '<p class="en-tip"><b>' + esc(t[0]) + '</b><span>' + esc(t[1]) + '</span></p>').join('') + '</div>' +
       '<div class="actions"><button type="button" class="btn-primary" data-close>확인</button></div>';
   }
+  if (P.type === 'burn'){
+    return timedBarHTML(P) + '<p class="eyebrow">번아웃 · 2년 연속 에너지 바닥</p><h3 id="m-title">' + esc(P.t) + '</h3><p>' + esc(P.b) + (P.exec ? ' 그해 연말, 스스로 물러나겠다고 말했다.' : '') + '</p>' +
+      (P.chips && P.chips.length ? '<div class="chips">' + chipsHTML(P.chips) + '</div>' : '') +
+      '<div class="actions"><button type="button" class="btn-primary" data-close>확인</button><span class="tnote">누르면 바로 닫혀요</span></div>';
+  }
   if (P.type === 'demote'){
     return '<p class="eyebrow">보직 변경 · ' + esc(P.why) + '</p><h3 id="m-title">' + esc(P.title) + ' → ' + esc(P.now) + '</h3><p>' + esc(P.text) + '</p>' +
       '<div class="actions"><button type="button" class="btn-primary" data-close>확인</button></div>';
@@ -5647,6 +5702,8 @@ $('#p-boss').addEventListener('click', e => {
   if (g) guessBoss(g.getAttribute('data-guess'), false);
 });
 $('#mcard').addEventListener('click', e => {
+  if (S && S.pending && S.pending.type === 'burn'){ closePopup(); return; }
+  if (S && S.pending && S.pending.type === 'cohort' && S.pending.tm && !S.pending.tm.pin && !e.target.closest('[data-close]')){ timedPause(true); return; }
   const oc = e.target.closest('[data-optc]');
   if (oc && S && S.pending && S.pending.type === 'decision'){ S.pending.confirmIdx = Number(oc.getAttribute('data-optc')); redrawDecision(); return; }
   if (e.target.closest('[data-optback]') && S && S.pending && S.pending.type === 'decision'){ delete S.pending.confirmIdx; redrawDecision(); return; }
