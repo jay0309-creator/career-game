@@ -163,6 +163,11 @@ h2,h3{text-wrap:balance}
 .guess{display:flex;flex-wrap:wrap;gap:6px}
 .guess button{border:1px dashed var(--ink-2);background:var(--paper);border-radius:999px;padding:4px 11px;font-size:13px;cursor:pointer}
 .guess button:hover{border-style:solid;border-color:var(--ink)}
+.guess button.on{border-style:solid;border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.bp-sec{display:grid;gap:7px;margin-top:14px}
+.bp-sec .sub{margin:0}
+.bp-h{margin:0;font-weight:700;font-size:14px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.bp-h span{font-weight:400;font-size:12px;color:var(--ink-2)}
 .grades{display:flex;flex-wrap:wrap;gap:4px}
 .gr{width:24px;height:26px;border-radius:5px;display:inline-grid;place-items:center;font-family:var(--f-display);font-weight:700;font-size:13px;border:1px solid var(--line);color:var(--ink-2)}
 .gr.g0{background:var(--amber);color:var(--on-amber);border-color:var(--amber)}
@@ -395,6 +400,7 @@ table.gt td.num{font-family:var(--f-mono)}
 .rv-st span{font-size:12px;color:var(--ink-2)}
 .rv-st.cur{border-color:var(--amber)}
 .rv-st:hover{border-color:var(--ink)}
+.rv-st.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--surface)}
 .mainc > *,.side > *{min-width:0}
 .gcard.still .rl{animation:none;opacity:1}
 .gcard.still .stamp{animation:none;opacity:1;transform:rotate(-9deg)}
@@ -754,7 +760,7 @@ table.gt td.num{font-family:var(--f-mono)}
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </div>
 
-<div class="ver-tag" aria-hidden="true">v27</div>
+<div class="ver-tag" aria-hidden="true">v28</div>
 <div id="bgm-box" class="bgm-box"><button type="button" id="bgm-btn" class="bgm-btn" aria-pressed="false">♪ 배경음악 꺼짐</button><button type="button" id="sfx-btn" class="bgm-btn" aria-pressed="false">효과음 꺼짐</button></div>
 <script>
 window.__g125ok = true;
@@ -4585,7 +4591,7 @@ const BGM = (() => {
     if (el.closest('.opt-cf') && el.hasAttribute('data-opt')) return click('double');
     if (el.hasAttribute('data-opt') || el.hasAttribute('data-optc') || el.hasAttribute('data-imp')) return click('stamp');
     if (el.hasAttribute('data-lead')) return click('rise');
-    if (el.matches('[data-actpick], [data-act], [data-rv], [data-guess], [data-pguess], label, select')) return click('tick');
+    if (el.matches('[data-actpick], [data-act], [data-rv], [data-guess], [data-pguess], [data-pst], label, select')) return click('tick');
     click('tap');
   }
   return {
@@ -5322,6 +5328,34 @@ function decisionHTML(){
   }).join('');
   return '<div class="event' + (e.chain ? ' chainev' : '') + '" id="event-card"><p class="eyebrow">' + tagL + (e.chain ? '' : '결정 · ') + S.year + '년 ' + P.month + '월</p><h3>' + esc(evTitle(e, d)) + '</h3><p class="body">' + esc(e.body(S, d)) + '</p><div class="opts">' + opts + '</div>' + (S.auto ? '<p class="autonote">자동 결정이 켜져 있어 잠시 뒤 이 사람의 상태에 따라 고릅니다.</p>' : '') + '</div>';
 }
+/* v28: 새 상사 창에서 성향 찍기와 일하는 자세 변경을 함께 */
+function bossPickHTML(P, live, cands){
+  const sel = P.st || S.stanceNext;
+  let h = '';
+  if (live) h += '<div class="bp-sec"><p class="bp-h">성향 찍기<span>맞히면 궁합 +10 · 첫 고과 때 공개 · 나중에 바꿀 수 있어요</span></p><div class="guess">' +
+    cands.map(t => '<button type="button" data-pguess="' + t + '" aria-pressed="' + (P.g === t) + '"' + (P.g === t ? ' class="on"' : '') + '>' + esc(BOSS[t].label) + '</button>').join('') + '</div></div>';
+  const tip = live ? (P.g ? (knownSt(P.g).length ? '찍은 성향(' + BOSS[P.g].label + ') 상사와 겪어 본 상성을 보여 줘요.' : '찍은 성향의 상사는 아직 겪어 본 적이 없어 상성을 몰라요.') : '성향을 찍으면, 그 성향 상사와 겪어 본 상성이 함께 보여요.') : '';
+  h += '<div class="bp-sec"><p class="bp-h">일하는 자세<span>다음 해부터 적용</span></p>' + (tip ? '<p class="sub">' + esc(tip) + '</p>' : '') + '<div class="rv-list">' +
+    STANCE_KEYS.map(st => {
+      let c;
+      if (!live) c = '상성 ' + chemLabel(st);
+      else if (P.g && knownSt(P.g).indexOf(st) >= 0) c = '찍은 성향 기준 ' + chemText(CHEM[P.g][STANCE_KEYS.indexOf(st)]);
+      else c = STANCE_SHORT[st];
+      return '<button type="button" class="rv-st' + (st === sel ? ' on' : '') + (st === S.stance ? ' cur' : '') + '" data-pst="' + st + '" aria-pressed="' + (st === sel) + '"><b>' + esc(STANCE[st].label) + (st === S.stance ? ' (지금)' : '') + '</b><span>' + esc(c) + '</span></button>';
+    }).join('') + '</div></div>';
+  const chg = sel !== S.stanceNext;
+  h += '<div class="actions"><button type="button" class="btn-primary" data-bpok>' + (live && !P.g ? (chg ? '자세만 바꾸고 나중에 찍기' : '나중에 찍기') : '확인') + '</button></div>';
+  return h;
+}
+function bossPickApply(){
+  const P = S && S.pending; if (!P) return;
+  if (P.g && S.boss && S.boss.hidden && BOSS[P.g]){ S.boss.guess = P.g; guessOpen = false; }
+  const msg = [];
+  if (P.g) msg.push('찍었다 · <b>' + esc(BOSS[P.g].label) + '</b>');
+  if (P.st && P.st !== S.stanceNext && STANCE[P.st]){ S.stanceNext = P.st; S.autoBase = null; msg.push('다음 해부터 <b>' + esc(STANCE[P.st].label) + '</b>'); }
+  if (msg.length) toast(msg.join(' · '));
+  closePopup();
+}
 function modalHTML(){
   const P = S.pending;
   if (P.type === 'cohort') return cohortHTML(P);
@@ -5339,17 +5373,15 @@ function modalHTML(){
     const live = S.boss.hidden;
     return head + '<h3 id="m-title">' + esc(S.boss.name) + ' 님의 반응</h3><p class="sub">' + esc(P.answer) + '</p><p>' + esc(P.react) + '</p>' +
       (P.v ? '<p style="font-family:var(--f-mono);font-size:13px;font-weight:600;color:' + (P.v > 0 ? 'var(--good)' : 'var(--bad)') + '">궁합 ' + (P.v > 0 ? '+' : '') + P.v + '</p>' : '') +
-      (live ? '<div class="box"><p class="sub">어떤 사람인지는 아직 모른다. 첫 고과 때 정체가 드러나요. 지금 찍어 두면, 맞혔을 때 궁합 +10. 나중에 바꿀 수도 있어요.</p><div class="guess">' + S.boss.cands.map(t => '<button type="button" data-pguess="' + t + '">' + esc(BOSS[t].label) + '</button>').join('') + '</div></div>' : '') +
-      '<div class="actions"><button type="button" class="btn-primary" data-close>' + (live ? '나중에 찍기' : '확인') + '</button></div>';
+      bossPickHTML(P, live, S.boss.cands);
   }
   if (P.type === 'boss'){
     const live = S.boss && S.boss.name === P.name && S.boss.hidden;
     return '<p class="eyebrow">인사 · 직속 상사 변경</p><h3 id="m-title">새 ' + esc(P.title) + '이 왔다</h3>' +
       (P.lead ? '<p class="sub">' + esc(P.lead) + '</p>' : '') +
       '<p class="big">' + esc(P.name) + ' 님</p><p>' + esc(P.hello) + '</p>' +
-      '<div class="box"><p class="rumor"><span>주변 소문 · 가끔 틀림</span>' + esc(P.rumor) + '</p>' +
-      (live ? '<p class="sub">어떤 사람인지는 아직 모른다. 첫 고과 때 정체가 드러나요. 지금 찍어 두면, 맞혔을 때 궁합 +10. 나중에 바꿀 수도 있어요.</p><div class="guess">' + P.cands.map(t => '<button type="button" data-pguess="' + t + '">' + esc(BOSS[t].label) + '</button>').join('') + '</div>' : '') +
-      '</div><div class="actions"><button type="button" class="btn-primary" data-close>' + (live ? '나중에 찍기' : '확인') + '</button></div>';
+      '<div class="box"><p class="rumor"><span>주변 소문 · 가끔 틀림</span>' + esc(P.rumor) + '</p></div>' +
+      (S.boss && S.boss.name === P.name ? bossPickHTML(P, live, P.cands) : '<div class="actions"><button type="button" class="btn-primary" data-close>확인</button></div>');
   }
   if (P.type === 'promo'){
     return '<p class="eyebrow">' + esc(P.title) + '</p><p class="big" id="m-title">' + esc(P.big) + '</p><p>' + esc(P.text) + '</p><p class="sub">' + esc(P.sub || '') + '</p>' +
@@ -5628,8 +5660,17 @@ $('#mcard').addEventListener('click', e => {
   }
   const im = e.target.closest('[data-imp]');
   if (im){ impAnswer(Number(im.getAttribute('data-imp'))); return; }
-  const g = e.target.closest('[data-pguess]');
-  if (g){ guessBoss(g.getAttribute('data-pguess'), true); return; }
+  const g = e.target.closest('[data-pguess]'), ps = e.target.closest('[data-pst]');
+  if ((g || ps) && S && S.pending && (S.pending.type === 'boss' || S.pending.type === 'meet')){
+    const P = S.pending;
+    if (g){ const t = g.getAttribute('data-pguess'); P.g = P.g === t ? null : t; }
+    else P.st = ps.getAttribute('data-pst');
+    const key = g ? '[data-pguess="' + g.getAttribute('data-pguess') + '"]' : '[data-pst="' + ps.getAttribute('data-pst') + '"]';
+    $('#mcard').innerHTML = modalHTML();
+    const f = $('#mcard').querySelector(key); if (f) f.focus();
+    return;
+  }
+  if (e.target.closest('[data-bpok]')){ bossPickApply(); return; }
   if (e.target.closest('[data-close]')) closePopup();
 });
 $('#p-acts').addEventListener('click', e => {
