@@ -301,6 +301,9 @@ table.gt td.num{font-family:var(--f-mono)}
 @keyframes enblink{50%{opacity:.35}}
 @media (prefers-reduced-motion: reduce){.bar i.blink{animation:none}}
 .en-warn{grid-column:1/-1;margin:4px 0 0;font-size:12px;line-height:1.5;color:var(--bad);font-weight:600}
+.en-warn span{display:block;font-weight:400;color:var(--ink-2);margin-top:2px}
+.en-tip{display:grid;gap:0;margin:6px 0 0;font-size:13px;line-height:1.45}
+.en-tip span{color:var(--ink-2);font-size:12.5px}
 .chip.warn{color:var(--bad);border-color:var(--bad);font-weight:600}
 .bar i.warm{background:var(--amber)}
 .bar i.teal{background:var(--teal)}
@@ -751,7 +754,7 @@ table.gt td.num{font-family:var(--f-mono)}
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </div>
 
-<div class="ver-tag" aria-hidden="true">v24</div>
+<div class="ver-tag" aria-hidden="true">v25</div>
 <div id="bgm-box" class="bgm-box"><button type="button" id="bgm-btn" class="bgm-btn" aria-pressed="false">♪ 배경음악 꺼짐</button><button type="button" id="sfx-btn" class="bgm-btn" aria-pressed="false">효과음 꺼짐</button></div>
 <script>
 window.__g125ok = true;
@@ -4607,7 +4610,7 @@ function showNextPopup(){
     return;
   }
   S.pending = Object.assign({modal:true}, it); S.ff = false;
-  try { if (it.type === 'grade') BGM.grade(it.g); else if (it.type === 'promo' || it.type === 'role') BGM.fanfare(); else if (it.type === 'demote') BGM.sad(); } catch (e) {}
+  try { if (it.type === 'grade') BGM.grade(it.g); else if (it.type === 'promo' || it.type === 'role') BGM.fanfare(); else if (it.type === 'demote' || it.type === 'yellow') BGM.sad(); } catch (e) {}
   renderPlay();
   if (it.type === 'grade') armGrade();
 }
@@ -4916,22 +4919,36 @@ function checkDemotion(g){
   else if (rg.length >= 4 && rg.slice(-4).every(x => GPTS[x] <= 2)) logItem('note', '“요즘 존재감이 좀 약하네요.” 윗선에서 그런 말이 돈다고 한다.');
 }
 
+/* v25: 에너지 회복 수단 안내 */
+const EN_TIPS = [
+  ['일하는 자세를 ‘칼퇴 수호자’로', '연말마다 에너지 +9 (‘묵묵한 장인’은 +3). 다음 해부터 적용돼요.'],
+  ['휴가 사건에서 쉬는 선택지', '‘일주일 다 쓴다’, ‘연차 이틀 붙여 쉰다’, ‘2주 다 쓴다’처럼 쉬는 쪽을 골라요.'],
+  ['부가활동 바꾸기', '에너지를 쓰는 활동은 빼고, ‘6시 정각 사무실 불 끄기’·‘점심시간 헬스장 오픈런’처럼 채우는 활동을 골라요.'],
+  ['⚠ 에너지 바닥 표시가 붙은 선택지 피하기', '에너지가 15 이하일 때 에너지를 쓰는 선택지에 표시가 붙어요.'],
+  ['한계 이벤트가 뜨면 ‘이틀 쉰다’', '에너지가 20 아래로 떨어지면 가끔 떠요. 에너지 +12.']
+];
 /* v24: 에너지 0으로 연말을 맞은 보직자 */
 function burnoutDown(S){
   const was = ROLE_T[S.role]; const to = S.role - 1; const now = ROLE_T[to];
   S.role = to; S.roleStart = S.year + 1; S.flags.noOffer = S.year + 2; S.cnt.burnDowns = (S.cnt.burnDowns || 0) + 1;
-  logItem('mile', '에너지가 바닥난 채 연말을 맞았다. ' + was + ' 자리를 내려놓았다.');
+  logItem('mile', '2년 연속 에너지가 바닥난 채 연말을 맞았다. ' + was + ' 자리를 내려놓았다.');
   addPath(S, was + ' → ' + now + ' (번아웃)');
-  enqueue({type:'demote', title:was, now, why:'번아웃', text:'에너지가 0인 채로 연말을 맞았다. ' + was + ' 자리를 내려놓고 ' + euro(now) + ' 돌아간다. 2년 동안은 보직 제안이 오지 않는다.'});
+  enqueue({type:'demote', title:was, now, why:'번아웃', text:'2년 연속 에너지가 0인 채로 연말을 맞았다. ' + was + ' 자리를 내려놓고 ' + euro(now) + ' 돌아간다. 2년 동안은 보직 제안이 오지 않는다.'});
   changeBoss(S, 'selfDown'); resetActs(S);
 }
 function yearEnd(){
   S.month = 12;
   let burnEnd = false;
-  if (!S.away && lvl(S) >= 1 && S.st.energy < 1){
-    if (lvl(S) >= 3){ burnEnd = true; S.flags.burnEnd = 1; logItem('mile', '에너지가 바닥난 채 연말을 맞았다. 자리에서 물러나기로 했다.'); }
+  const zeroNow = !S.away && lvl(S) >= 1 && S.st.energy < 1;
+  if (zeroNow && S.flags.zeroPrev){
+    S.flags.zeroPrev = false;
+    if (lvl(S) >= 3){ burnEnd = true; S.flags.burnEnd = 1; logItem('mile', '2년 연속 에너지가 바닥난 채 연말을 맞았다. 자리에서 물러나기로 했다.'); }
     else burnoutDown(S);
-  }
+  } else if (zeroNow){
+    S.flags.zeroPrev = true; S.cnt.yellow = (S.cnt.yellow || 0) + 1;
+    logItem('mile', '에너지가 바닥난 채 한 해를 마쳤다. 옐로카드를 받았다. 내년에도 이러면 ' + (lvl(S) >= 3 ? '자리에서 물러나야 한다.' : '보직을 내려놓아야 한다.'));
+    enqueue({type:'yellow', title:'옐로카드', exec:lvl(S) >= 3, role:roleOf(S)});
+  } else S.flags.zeroPrev = false;
   const awayRest = S.away && S.away.group === 'rest';
   const L = lvl(S);
   const SD = STANCE[S.stance];
@@ -5190,7 +5207,7 @@ function statsHTML(){
   h += csItem('궁합', S.rapport, S.rapport < 30 ? 'low' : 'warm');
   if (lvl(S) >= 1) h += csItem('분위기', S.vibe, S.vibe < 30 ? 'low' : 'teal');
   if (!S.exec && S.cl < 4) h += csItem('승격', S.pts / PTS_NEED * 100, 'warm', S.pts + '/' + PTS_NEED);
-  if (lvl(S) >= 1 && !S.away && S.st.energy <= 15) h += '<p class="en-warn" role="status">⚠ 에너지가 0인 채로 연말을 맞으면 ' + (lvl(S) >= 3 ? '자리에서 물러나요' : '보직이 한 단계 내려가요') + '. 휴가 선택지나 ‘이틀 쉰다’로 회복할 수 있어요.</p>';
+  if (lvl(S) >= 1 && !S.away && (S.st.energy <= 15 || S.flags.zeroPrev)) h += '<p class="en-warn" role="status">⚠ ' + (S.flags.zeroPrev ? '옐로카드 상태예요. 올해 연말에도 에너지가 0이면 ' : '에너지 0으로 연말을 맞으면 옐로카드, 2년 연속이면 ') + (lvl(S) >= 3 ? '자리에서 물러나요(퇴임).' : '보직이 한 단계 내려가요.') + '<span>회복: 자세 ‘칼퇴 수호자’(연말 +9) · 휴가 사건에서 쉬는 선택지 · 에너지 채우는 부가활동(‘6시 정각 사무실 불 끄기’ 등) · ⚠ 표시 선택지 피하기</span></p>';
   return h;
 }
 function miniHTML(p){
@@ -5309,6 +5326,12 @@ function modalHTML(){
   }
   if (P.type === 'role'){
     return '<p class="eyebrow">보직 발령</p><p class="big" id="m-title">' + esc(P.title) + '</p><p>' + esc(P.text) + '</p>' + (P.same ? '<p class="sub">' + esc(P.same) + '</p>' : '') +
+      '<div class="actions"><button type="button" class="btn-primary" data-close>확인</button></div>';
+  }
+  if (P.type === 'yellow'){
+    return '<p class="eyebrow">경고 · ' + esc(P.role) + '</p><h3 id="m-title">옐로카드: 에너지가 바닥난 채 한 해를 마쳤다</h3>' +
+      '<p>내년 연말에도 에너지가 0이면 ' + (P.exec ? '<b>자리에서 물러나야 해요(임원 퇴임 엔딩).</b>' : '<b>보직이 한 단계 내려가요.</b>') + ' 1 이상으로 회복하면 옐로카드는 사라져요.</p>' +
+      '<div class="box"><p class="sub" style="margin:0 0 2px">회복하는 방법</p>' + EN_TIPS.map(t => '<p class="en-tip"><b>' + esc(t[0]) + '</b><span>' + esc(t[1]) + '</span></p>').join('') + '</div>' +
       '<div class="actions"><button type="button" class="btn-primary" data-close>확인</button></div>';
   }
   if (P.type === 'demote'){
