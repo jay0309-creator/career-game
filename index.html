@@ -369,7 +369,10 @@ table.gt td.num{font-family:var(--f-mono)}
 .lv-c.n{border-left-color:var(--bad)}
 .lv-c span{display:block;font-family:var(--f-mono);font-size:10.5px;color:var(--ink-2);margin-bottom:2px}
 .it.levalit::before{content:"평가";font-family:var(--f-mono);font-size:10.5px;border:1px solid var(--ink-2);color:var(--ink-2);border-radius:3px;padding:0 4px;margin-right:6px;vertical-align:1px}
-.bgm-btn{position:fixed;right:max(12px, env(safe-area-inset-right, 0px));bottom:max(12px, env(safe-area-inset-bottom, 0px));z-index:30;font:600 12.5px var(--f-body);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 12px;box-shadow:0 4px 14px rgba(0,0,0,.12);cursor:pointer}
+.bgm-box{position:fixed;right:max(12px, env(safe-area-inset-right, 0px));bottom:max(12px, env(safe-area-inset-bottom, 0px));z-index:30;display:flex;align-items:center;gap:8px}
+.bgm-box input[type=range]{width:110px;accent-color:var(--amber);background:var(--surface);border-radius:999px;padding:6px 8px;border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.12);height:30px}
+@media (max-width:480px){.bgm-box input[type=range]{width:84px}}
+.bgm-btn{font:600 12.5px var(--f-body);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 12px;box-shadow:0 4px 14px rgba(0,0,0,.12);cursor:pointer}
 .bgm-btn:hover{border-color:var(--ink)}
 .bgm-btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .coh-end{font-family:var(--f-display);font-size:16px;margin:2px 0 0;line-height:1.45}
@@ -744,7 +747,7 @@ table.gt td.num{font-family:var(--f-mono)}
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </div>
 
-<button type="button" id="bgm-btn" class="bgm-btn" aria-pressed="false">♪ 소리 꺼짐</button>
+<div id="bgm-box" class="bgm-box"><input type="range" id="bgm-vol" min="0" max="100" step="5" value="60" aria-label="음량" hidden><button type="button" id="bgm-btn" class="bgm-btn" aria-pressed="false">♪ 소리 꺼짐</button></div>
 <script>
 window.__g125ok = true;
 (function(){
@@ -4437,16 +4440,17 @@ function leadEndHTML(){
 }
 /* ---------- v20: 배경음악과 버튼 소리. 음원 파일 없이 Web Audio로 그 자리에서 만든다 (저작권 걱정 없음) ---------- */
 const BGM = (() => {
-  let ctx = null, master = null, sfx = null, noiseBuf = null, timer = null, nextT = 0, step = 0, scene = 'L0', want = 'L0', switchAt = 0, on = false;
+  let ctx = null, master = null, sfx = null, noiseBuf = null, timer = null, nextT = 0, step = 0, scene = 'intro', want = 'intro', switchAt = 0, on = false;
   const rnd = Math.random; // 게임 난수(R)는 건드리지 않는다
-  const VOL = 0.55;
+  const vol = () => { const v = Number(store.get('g125-vol', 60)); return isFinite(v) ? clamp(v, 0, 100) : 60; };
+  const musicVol = () => 0.55 * vol() / 60 + 0.0001;
   const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
   function build(){
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
     ctx = new AC();
     const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2000; lp.Q.value = 0.3;
     master = ctx.createGain(); master.gain.value = 0; master.connect(lp); lp.connect(ctx.destination);
-    sfx = ctx.createGain(); sfx.gain.value = 1; sfx.connect(ctx.destination);
+    sfx = ctx.createGain(); sfx.gain.value = vol() / 60; sfx.connect(ctx.destination);
     noiseBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.08), ctx.sampleRate);
     const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = rnd() * 2 - 1;
     return true;
@@ -4467,6 +4471,9 @@ const BGM = (() => {
   }
   /* 보직마다 다른 곡. play(i: 8분음표 위치 0~7, bar, ch: 코드, t, e8, loop) */
   const SONG = {
+    // 첫 화면·입사 공개: 설레는 느낌의 맑은 아르페지오
+    intro:{bpm:80, prog:[[48, 52, 55, 60], [43, 47, 50, 55], [45, 48, 52, 57], [41, 45, 48, 53]], bass:[36, 31, 33, 29],
+      play(i, b, ch, t, e8, loop){ note(t, ch[[0, 1, 2, 3, 2, 3, 1, 2][i]] + 12, e8 * 2.2, 'sine', 0.026, 0.006); if (i === 0) note(t, this.bass[b] + 12, e8 * 7.5, 'sine', 0.055, 0.05); if (i === 4 && loop % 2 && rnd() < 0.5) note(t, ch[3] + 24, e8 * 3, 'triangle', 0.011, 0.01); }},
     // 파트원: 가벼운 로파이
     L0:{bpm:76, prog:[[53, 57, 60, 64], [50, 53, 57, 60], [55, 58, 62, 65], [48, 52, 55, 58]], bass:[41, 38, 43, 36],
       play(i, b, ch, t, e8, loop){ note(t, ch[[0, 1, 2, 3, 2, 1, 2, 3][i]] + 12, e8 * 1.7, 'triangle', 0.024); if (i === 0 || i === 4) note(t, this.bass[b], e8 * 3.6, 'sine', 0.07); if (i % 4 === 2) hat(t, 0.005); if (loop % 2 && i % 2 === 0 && rnd() < 0.25) note(t, ch[Math.floor(rnd() * 4)] + 24, e8 * 2, 'sine', 0.014); }},
@@ -4490,7 +4497,7 @@ const BGM = (() => {
     if (!ctx || !on) return;
     if (want !== scene && ctx.currentTime >= switchAt){
       scene = want; step = 0;
-      master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(0.0001, ctx.currentTime); master.gain.linearRampToValueAtTime(VOL, ctx.currentTime + 1.8);
+      master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(0.0001, ctx.currentTime); master.gain.linearRampToValueAtTime(musicVol(), ctx.currentTime + 1.8);
     }
     const sg = SONG[scene]; const e8 = 60 / sg.bpm / 2;
     if (nextT < ctx.currentTime - 0.2) nextT = ctx.currentTime + 0.05;
@@ -4519,7 +4526,7 @@ const BGM = (() => {
     if (!ctx && !build()) return false;
     if (ctx.state === 'suspended') ctx.resume();
     on = true; scene = want; step = 0; nextT = ctx.currentTime + 0.08;
-    master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(0.0001, ctx.currentTime); master.gain.linearRampToValueAtTime(VOL, ctx.currentTime + 1.5);
+    master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(0.0001, ctx.currentTime); master.gain.linearRampToValueAtTime(musicVol(), ctx.currentTime + 1.5);
     clearInterval(timer); timer = setInterval(tick, 40); tick();
     return true;
   }
@@ -4531,6 +4538,13 @@ const BGM = (() => {
     const b = document.getElementById('bgm-btn'); if (!b) return;
     const p = store.get('g125-bgm', false) === true;
     b.setAttribute('aria-pressed', p ? 'true' : 'false'); b.textContent = p ? '♪ 소리 켜짐' : '♪ 소리 꺼짐';
+    const r = document.getElementById('bgm-vol'); if (r){ r.hidden = !p; r.value = vol(); }
+  }
+  function setVol(v){
+    store.set('g125-vol', v);
+    if (!ctx) return;
+    sfx.gain.setTargetAtTime(v / 60, ctx.currentTime, 0.05);
+    if (on && want === scene){ master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setTargetAtTime(musicVol(), ctx.currentTime, 0.08); }
   }
   function click(kind){
     if (!ctx || !on) return;
@@ -4544,7 +4558,8 @@ const BGM = (() => {
   /* 사람이 직접 누른 버튼에만 소리를 낸다 (자동 결정에는 소리 없음) */
   function onClick(e){
     if (!e.isTrusted || !on) return;
-    const el = e.target.closest('button, [role="button"], label, summary, select'); if (!el || el.id === 'bgm-btn') return;
+    if (e.target.closest('#bgm-box')) return;
+    const el = e.target.closest('button, [role="button"], label, summary, select'); if (!el) return;
     if (el.closest('.opt-cf') && el.hasAttribute('data-opt')) return click('double');
     if (el.hasAttribute('data-opt') || el.hasAttribute('data-optc') || el.hasAttribute('data-imp')) return click('stamp');
     if (el.hasAttribute('data-lead')) return click('rise');
@@ -4556,7 +4571,9 @@ const BGM = (() => {
     init(){
       label();
       const b = document.getElementById('bgm-btn'); if (b) b.addEventListener('click', e => { e.stopPropagation(); BGM.toggle(); });
-      if (store.get('g125-bgm', false) === true) document.addEventListener('pointerdown', () => { if (!on && store.get('g125-bgm', false) === true) start(); }, {once:true});
+      const wake = e => { if (e.target.closest && e.target.closest('#bgm-box')) return; document.removeEventListener('pointerdown', wake, true); if (!on && store.get('g125-bgm', false) === true) start(); };
+      if (store.get('g125-bgm', false) === true) document.addEventListener('pointerdown', wake, true);
+      const r = document.getElementById('bgm-vol'); if (r) r.addEventListener('input', () => setVol(Number(r.value)));
       document.addEventListener('click', onClick, true);
       document.addEventListener('visibilitychange', () => { if (!ctx) return; if (document.hidden) ctx.suspend(); else if (on) ctx.resume(); });
     },
@@ -4570,7 +4587,9 @@ const BGM = (() => {
     },
     fanfare(){ seq([60, 64, 67, [72, 76, 79]], 0.11, 'triangle', 0.045, 1.1); },
     grade(g){ if (g === '가' || g === '나') seq([67, 71, 74, [79, 83]], 0.1, 'triangle', 0.04, 0.9); else if (g === '라' || g === '마') seq([64, 61, [58, 53]], 0.18, 'sine', 0.045, 1.2); else seq([67, [72, 76]], 0.14, 'sine', 0.035, 0.7); },
-    sad(){ seq([62, 58, [55, 50]], 0.2, 'sine', 0.045, 1.3); }
+    sad(){ seq([62, 58, [55, 50]], 0.2, 'sine', 0.045, 1.3); },
+    roll(){ if (ctx && on) note(ctx.currentTime + 0.005, 91 + Math.floor(rnd() * 5), 0.03, 'triangle', 0.012, 0.002, sfx); },
+    set(k){ if (ctx && on) note(ctx.currentTime + 0.005, [72, 74, 76, 79, 81, 84, 86, 88, 91][k % 9], 0.35, 'sine', 0.03, 0.005, sfx); }
   };
 })();
 /* ---------- popup queue ---------- */
@@ -5042,7 +5061,7 @@ function endHeadline(){
 
 /* ---------- rendering ---------- */
 function show(mode){
-  try { BGM.scene(mode === 'end' ? 'end' : mode === 'play' && S ? 'L' + Math.min(lvl(S), 4) : 'L0'); } catch (e) {}
+  try { BGM.scene(mode === 'end' ? 'end' : mode === 'play' && S ? 'L' + Math.min(lvl(S), 4) : 'intro'); } catch (e) {}
   ['intro','reveal','play','end'].forEach(m => { $('#v-' + m).hidden = (m !== mode); });
   try { window.scrollTo(0, 0); } catch (e) {}
 }
@@ -5448,8 +5467,8 @@ async function runReveal(instant){
     row.innerHTML = '<span class="k">' + esc(d[0]) + '</span><span class="v"></span>';
     rows.appendChild(row);
     const v = row.querySelector('.v');
-    if (!fast){ const end = performance.now() + 480; while (performance.now() < end){ v.textContent = pick(d[2]); await sleep(55); if (tok !== revealToken) return; } }
-    v.textContent = d[1]; v.classList.add('set');
+    if (!fast){ const end = performance.now() + 480; while (performance.now() < end){ v.textContent = pick(d[2]); try { BGM.roll(); } catch (e) {} await sleep(55); if (tok !== revealToken) return; } }
+    v.textContent = d[1]; v.classList.add('set'); try { BGM.set(data.indexOf(d)); } catch (e) {}
     if (!fast) await sleep(200);
   }
   if (tok !== revealToken) return;
