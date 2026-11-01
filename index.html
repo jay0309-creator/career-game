@@ -369,6 +369,7 @@ table.gt td.num{font-family:var(--f-mono)}
 .lv-c.n{border-left-color:var(--bad)}
 .lv-c span{display:block;font-family:var(--f-mono);font-size:10.5px;color:var(--ink-2);margin-bottom:2px}
 .it.levalit::before{content:"평가";font-family:var(--f-mono);font-size:10.5px;border:1px solid var(--ink-2);color:var(--ink-2);border-radius:3px;padding:0 4px;margin-right:6px;vertical-align:1px}
+.ver-tag{position:fixed;left:max(10px, env(safe-area-inset-left, 0px));bottom:max(8px, env(safe-area-inset-bottom, 0px));z-index:5;font:500 11px var(--f-mono);color:var(--ink-2);opacity:.45;pointer-events:none;user-select:none}
 .bgm-box{position:fixed;right:max(12px, env(safe-area-inset-right, 0px));bottom:max(12px, env(safe-area-inset-bottom, 0px));z-index:30;display:flex;align-items:center;gap:8px}
 .bgm-btn{font:600 12.5px var(--f-body);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 12px;box-shadow:0 4px 14px rgba(0,0,0,.12);cursor:pointer}
 .bgm-btn:hover{border-color:var(--ink)}
@@ -745,6 +746,7 @@ table.gt td.num{font-family:var(--f-mono)}
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 </div>
 
+<div class="ver-tag" aria-hidden="true">v23</div>
 <div id="bgm-box" class="bgm-box"><button type="button" id="bgm-btn" class="bgm-btn" aria-pressed="false">♪ 배경음악 꺼짐</button><button type="button" id="sfx-btn" class="bgm-btn" aria-pressed="false">효과음 꺼짐</button></div>
 <script>
 window.__g125ok = true;
